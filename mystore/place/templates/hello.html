@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <style>
+        /* Style for the entire page */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: #ffffff;
+        }
+
+        /* Style for the header */
+        header {
+            text-align: center;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        header h1 {
+            font-size: 48px;
+            margin: 0;
+        }
+
+        header p {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+
+        /* Navigation bar styles */
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 10px 0;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 18px;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #ffd700;
+        }
+
+        /* Main content styles */
+        main {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        main h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        main p {
+            font-size: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Footer styles */
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2);
+            color: #cccccc;
+        }
+
+        footer a {
+            color: #ffd700;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        footer a:hover {
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Welcome to Your Home Page</h1>
+        <p>Where creativity meets simplicity.</p>
+    </header>
+    <nav>
+        <a href="#about">About</a>
+        <a href="#services">Services</a>
+        <a href="#contact">Contact</a>
+    </nav>
+    <main>
+        <h2>Discover More</h2> 
+        <button onclick="console.log('Redirecting to login...'); window.location.href='/place/login/';">Login</button>
+        <style>
+        button {
+            position: absolute; /* Ensure the button is positioned relative to the top-left of the page */
+            top: 20px;          /* Distance from the top of the page */
+            right: 20px;        /* Distance from the right edge of the page */
+            background-color: #0056b3; /* Button color */
+            color: white;             /* Text color */
+            font-size: 16px;          /* Font size */
+            font-weight: bold;        /* Bold text */
+            padding: 10px 15px;       /* Padding for size */
+            border: none;             /* No borders */
+            border-radius: 5px;       /* Rounded corners */
+            cursor: pointer;          /* Pointer cursor on hover */
+            transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
+        }
+        
+        button:hover {
+            background-color: #004494; /* Darker shade when hovering */
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); /* Enhanced shadow */
+        }
+        
+        button:focus {
+            outline: none; /* Remove focus outline */
+            box-shadow: 0 0 5px rgba(0, 86, 179, 0.5); /* Glow effect on focus */
+        }
+        
+        button:disabled {
+            background-color: #ccc; /* Grey out button */
+            cursor: not-allowed;    /* Show a disabled cursor */
+        }
+    </style>
+        <p>
+            This is your home page! Customize it to highlight the best features of your project, business, or portfolio. 
+            Use the navigation bar to explore different sections and get started on your journey.
+        </p>
+    </main>
+    <footer>
+        <p>&copy; 2025 Your Name or Business. All rights reserved.</p>
+        <p><a href="#contact">Privacy Policy</a> | <a href="#terms">Terms of Service</a></p>
+    </footer>
+</body>
+</html>
