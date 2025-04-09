@@ -36,7 +36,7 @@ def login(request):
         if user is not None:
             login(request, user)  # Log the user in
             messages.success(request, "Logged in successfully!")
-            return redirect('/place/hello/')  # Redirect to a dashboard or home page
+            return redirect('/hello')  # Redirect to a dashboard or home page
         else:
             messages.error(request, "Invalid username or password.")
 
