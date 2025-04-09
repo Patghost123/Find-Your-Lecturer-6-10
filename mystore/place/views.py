@@ -15,7 +15,6 @@ def join(request):
         if user.objects.filter(email=email).exists():
             print("Email already registered.")
             messages.error(request, "This email is already registered.")
-            return render(request, 'join.html')
         else:
             new_user = user(username=username, email=email, passwd=passwd)
             new_user.save()
@@ -47,6 +46,7 @@ def hello(request):
 
 def login(request):
     return render(request, 'login.html')
-    
+
+
     
 
