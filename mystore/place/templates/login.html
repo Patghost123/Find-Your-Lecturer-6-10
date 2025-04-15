@@ -99,7 +99,7 @@
 </head>
 <body>
     <!-- Home Button -->
-    <a href="/place/hello/" class="home-button">Home</a>
+    <a href="/hello" class="home-button">Home</a>
     
     <!-- Login Container -->
     <div class="login-container">
@@ -111,7 +111,7 @@
                 {% endfor %}
             </ul>
         {% endif %}
-        <form method="POST" action="/place/login/">
+        <form method="POST" action="/login">
             {% csrf_token %}
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" required><br><br>
