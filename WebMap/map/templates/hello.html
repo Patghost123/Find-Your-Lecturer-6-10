@@ -88,27 +88,13 @@
         footer a:hover {
             color: #ffffff;
         }
-    </style>
-</head>
-<body>
-    <header>
-        <h1>Welcome to Your Home Page</h1>
-        <p>Where creativity meets simplicity.</p>
-    </header>
-    <nav>
-        <a href="#about">About</a>
-        <a href="#services">Services</a>
-        <a href="#contact">Contact</a>
-    </nav>
-    <main>
-        <h2>Discover More</h2> 
-        <button onclick="console.log('Redirecting to login...'); window.location.href='/login';">Login</button>
-        <style>
-        button {
-            position: absolute; /* Ensure the button is positioned relative to the top-left of the page */
-            top: 20px;          /* Distance from the top of the page */
-            right: 20px;        /* Distance from the right edge of the page */
-            background-color: #0056b3; /* Button color */
+
+        /* Signup Button Styling */
+        .signup-button {
+            position: absolute; /* Fixed position */
+            top: 20px;          /* Distance from the top */
+            left: 20px;         /* Distance from the left */
+            background-color: #0056b3; /* Blue to match the theme as Login button*/
             color: white;             /* Text color */
             font-size: 16px;          /* Font size */
             font-weight: bold;        /* Bold text */
@@ -116,30 +102,78 @@
             border: none;             /* No borders */
             border-radius: 5px;       /* Rounded corners */
             cursor: pointer;          /* Pointer cursor on hover */
-            transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
+            transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions */
         }
-        
-        button:hover {
-            background-color: #004494; /* Darker shade when hovering */
-            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); /* Enhanced shadow */
+
+        .signup-button:hover {
+            background-color: #004494; /* Slightly darker than the blue when hovering */
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3); /* Enhanced shadow */
         }
-        
-        button:focus {
+
+        .signup-button:focus {
+            outline: none; /* Remove focus outline */
+            box-shadow: 0 0 5px rgba(255, 193, 7, 0.5); /* Glow effect on focus */
+        }
+
+        /* Login Button Styling */
+        .login-button {
+            position: absolute; /* Fixed position */
+            top: 20px;          /* Distance from the top */
+            right: 20px;        /* Distance from the right */
+            background-color: #0056b3; /* Blue color for visibility */
+            color: white;             /* Text color */
+            font-size: 16px;          /* Font size */
+            font-weight: bold;        /* Bold text */
+            padding: 10px 15px;       /* Padding for size */
+            border: none;             /* No borders */
+            border-radius: 5px;       /* Rounded corners */
+            cursor: pointer;          /* Pointer cursor on hover */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
+            transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions */
+        }
+
+        .login-button:hover {
+            background-color: #004494; /* Slightly darker blue when hovering */
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3); /* Enhanced shadow */
+        }
+
+        .login-button:focus {
             outline: none; /* Remove focus outline */
             box-shadow: 0 0 5px rgba(0, 86, 179, 0.5); /* Glow effect on focus */
         }
-        
-        button:disabled {
-            background-color: #ccc; /* Grey out button */
-            cursor: not-allowed;    /* Show a disabled cursor */
-        }
     </style>
+</head>
+<body>
+    <!-- Signup Button -->
+    <button class="signup-button" onclick="window.location.href='/join';">Sign up</button>
+
+    <!-- Login Button -->
+    <button class="login-button" onclick="window.location.href='/login';">Login</button>
+
+    <!-- Header -->
+    <header>
+        <h1>Welcome to Your Home Page</h1>
+        <p>Where creativity meets simplicity.</p>
+    </header>
+
+    <!-- Navigation -->
+    <nav>
+        <a href="#about">About</a>
+        <a href="#services">Services</a>
+        <a href="#contact">Contact</a>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <h2>Discover More</h2>
         <p>
-            This is your home page! Customize it to highlight the best features of your project, business, or portfolio. 
+            This is your home page! Customize it to highlight the best features of your project, business, or portfolio.
             Use the navigation bar to explore different sections and get started on your journey.
         </p>
     </main>
+
+    <!-- Footer -->
     <footer>
         <p>&copy; 2025 Your Name or Business. All rights reserved.</p>
         <p><a href="#contact">Privacy Policy</a> | <a href="#terms">Terms of Service</a></p>

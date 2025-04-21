@@ -47,6 +47,12 @@ def hello(request):
 def login(request):
     return render(request, 'login.html')
 
+def signup(request):
+    return render(request, 'signup.html')
 
-    
+def join (request):
+    return render(request, 'join.html')
+
+def success (request):
+    return render(request, 'success.html')
 
