@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponse
-from .models import user
+from .models import Student
 from django.contrib import messages
 
 def join(request):
@@ -12,11 +12,11 @@ def join(request):
 
         print(f"POST data: username={username}, email={email}, passwd={passwd}")  # Debug form data
 
-        if user.objects.filter(email=email).exists():
+        if Student.objects.filter(email=email).exists():
             print("Email already registered.")
             messages.error(request, "This email is already registered.")
         else:
-            new_user = user(username=username, email=email, passwd=passwd)
+            new_user = Student(username=username, email=email, passwd=passwd)
             new_user.save()
             print(f"New user saved: {new_user}")  # Debug new user object
             messages.success(request, "Registered successfully!")
@@ -49,9 +49,6 @@ def login(request):
 
 def signup(request):
     return render(request, 'signup.html')
-
-def join (request):
-    return render(request, 'join.html')
 
 def success (request):
     return render(request, 'success.html')
