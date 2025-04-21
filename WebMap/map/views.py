@@ -19,8 +19,7 @@ def join(request):
             new_user = Student(username=username, email=email, passwd=passwd)
             new_user.save()
             print(f"New user saved: {new_user}")  # Debug new user object
-            messages.success(request, "Registered successfully!")
-            return render(request, 'join.html')
+            return render(request, 'hello.html')
 
     print("Handling GET request.")  # Debug for GET or unsupported methods
     return render(request, 'join.html')
@@ -31,15 +30,16 @@ def login(request):
         password = request.POST.get('password')
 
         # Use Django's authentication system to check credentials
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
+        try:
+            user = Student.objects.get(username=username, password=password)
+            request.session["user_id"] = user.id  # Store session manually
+            request.session["username"] = user.username
             login(request, user)  # Log the user in
-            messages.success(request, "Logged in successfully!")
-            return redirect('/hello')  # Redirect to a dashboard or home page
-        else:
-            messages.error(request, "Invalid username or password.")
-
-    return render(request, 'hello.html')  # Render the login page
+            return redirect("hello")
+        except Student.DoesNotExist:
+            print("Invalid login credentials.")  # Debug
+            messages.error(request, "Invalid email or password.")
+            return render(request, "login.html")
 
 def hello(request):
     return render(request, 'hello.html')

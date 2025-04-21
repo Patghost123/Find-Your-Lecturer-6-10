@@ -146,10 +146,23 @@
 </head>
 <body>
     <!-- Signup Button -->
+    {% if not Student.is_authenticated %}
     <button class="signup-button" onclick="window.location.href='/join';">Sign up</button>
-
+    
     <!-- Login Button -->
     <button class="login-button" onclick="window.location.href='/login';">Login</button>
+    {% else %}
+    <div class="user-info">
+        <p>Welcome, {{ Student.username }}!</p>
+    </div>
+
+    <!-- Logout Button -->
+    <form method="POST" action="{% url 'logout' %}" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="logout-button">Logout</button>
+    </form>
+{% endif %}
+
 
     <!-- Header -->
     <header>

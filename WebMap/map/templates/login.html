@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    {% if messages %}
+    <ul>
+        {% for message in messages %}
+            <li style="color:red;">{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
     <style>
         /* Home Button Styling */
         .home-button {
@@ -104,13 +111,6 @@
     <!-- Login Container -->
     <div class="login-container">
         <h1>Login</h1>
-        {% if messages %}
-            <ul>
-                {% for message in messages %}
-                    <li>{{ message }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
         <form method="POST" action="/login/">
             {% csrf_token %}
             <label for="username">Username:</label>
