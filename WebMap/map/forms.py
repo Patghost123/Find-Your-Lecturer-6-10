@@ -5,4 +5,4 @@ class userForm(forms.ModelForm):
     
     class Meta:
         model = Student
-        fields = ["email", "username" , "passwd"]
+        fields = ["email", "username" , "password"]

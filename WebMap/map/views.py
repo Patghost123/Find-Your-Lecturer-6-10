@@ -8,15 +8,15 @@ def join(request):
     if request.method == "POST":
         username = request.POST.get('username')
         email = request.POST.get('email')
-        passwd = request.POST.get('passwd')
+        password = request.POST.get('password')
 
-        print(f"POST data: username={username}, email={email}, passwd={passwd}")  # Debug form data
+        print(f"POST data: username={username}, email={email}, password={password}")  # Debug form data
 
         if Student.objects.filter(email=email).exists():
             print("Email already registered.")
             messages.error(request, "This email is already registered.")
         else:
-            new_user = Student(username=username, email=email, passwd=passwd)
+            new_user = Student(username=username, email=email, password=password)
             new_user.save()
             print(f"New user saved: {new_user}")  # Debug new user object
             return render(request, 'hello.html')
@@ -35,7 +35,7 @@ def login(request):
             request.session["user_id"] = user.id  # Store session manually
             request.session["username"] = user.username
             login(request, user)  # Log the user in
-            return redirect("hello")
+            return redirect(hello)
         except Student.DoesNotExist:
             print("Invalid login credentials.")  # Debug
             messages.error(request, "Invalid email or password.")
