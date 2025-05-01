@@ -29,17 +29,14 @@ def login(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
 
-        # Use Django's authentication system to check credentials
-        try:
-            user = Student.objects.get(username=username, password=password)
-            request.session["user_id"] = user.id  # Store session manually
-            request.session["username"] = user.username
-            login(request, user)  # Log the user in
-            return redirect(hello)
-        except Student.DoesNotExist:
-            print("Invalid login credentials.")  # Debug
-            messages.error(request, "Invalid email or password.")
-            return render(request, "login.html")
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('hello')  # or your homepage route
+        else:
+            messages.error(request, "Invalid username or password.")
+    
+    return render(request, "login.html")
 
 def hello(request):
     return render(request, 'hello.html')
