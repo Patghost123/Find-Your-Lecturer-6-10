@@ -10,8 +10,8 @@ class StudentManager(BaseUserManager):
         student.save(using=self._db)
         return student
 
-    def create_superuser(self, email, username, password=None):
-        student = self.create_user(email, username, password)
+    def create_superuser(self, username, password=None):
+        student = self.create_user(username, password)
         student.is_staff = True
         student.is_superuser = True
         student.is_active = True  # Ensure the superuser is active
@@ -35,3 +35,4 @@ class Student(AbstractBaseUser):
 
     def __str__(self):
         return self.username
+    
