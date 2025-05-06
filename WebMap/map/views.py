@@ -3,8 +3,7 @@ from django.contrib.auth import authenticate, login as auth_login
 from django.http import HttpResponse, JsonResponse
 from .models import Student
 from django.contrib import messages
-from django.contrib.auth.hashers import check_password
-
+from django.contrib.auth.hashers import make_password,check_password
 
 def join(request):
     if request.method == "POST":
@@ -12,18 +11,19 @@ def join(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
 
-        print(f"POST data: username={username}, email={email}, password={password}")  # Debug form data
+        print(f"POST data: username={username}, email={email}, password={password}")
 
         if Student.objects.filter(email=email).exists():
             print("Email already registered.")
             messages.error(request, "This email is already registered.")
         else:
-            new_user = Student(username=username, email=email, password=password)
+            hashed_password = make_password(password)
+            new_user = Student(username=username, email=email, password=hashed_password)
             new_user.save()
-            print(f"New user saved: {new_user}")  # Debug new user object
-            return render(request, 'hello.html')
+            print(f"New user saved: {new_user}")
+            return render(request, 'hello.html', {'student': new_user})
 
-    print("Handling GET request.")  # Debug for GET or unsupported methods
+    print("Handling GET request.")
     return render(request, 'join.html')
 
 def login(request):
@@ -34,13 +34,9 @@ def login(request):
         try:
             student = Student.objects.get(username=username)
 
-            # If password is stored in plaintext (not recommended for production):
-            if student.password == password:
-                request.session['student_id'] = student.id  # Optional: for session tracking
+            if check_password(password, student.password):
+                request.session['student_id'] = student.id
                 return render(request, 'hello.html', {'student': student})
-
-            # If using hashed passwords, use this instead:
-            # if check_password(password, student.password):
 
             else:
                 messages.error(request, "Invalid credentials")
@@ -53,7 +49,13 @@ def login(request):
     return render(request, 'login.html')
 
 def hello(request):
-    return render(request, 'hello.html')
+    student_id = request.session.get('student_id')
+
+    if not student_id:
+        return redirect('login')  # redirect to login if not logged in
+
+    student = Student.objects.get(id=student_id)
+    return render(request, 'hello.html', {'student': student})
 
 def signup(request):
     return render(request, 'signup.html')
