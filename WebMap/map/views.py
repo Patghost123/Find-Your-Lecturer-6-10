@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login as auth_login
 from django.http import HttpResponse, JsonResponse
 from .models import Student
 from django.contrib import messages
+from django.contrib.auth.hashers import check_password
+
 
 def join(request):
     if request.method == "POST":
@@ -29,22 +31,29 @@ def login(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
 
-        if not username or not password:
-            return JsonResponse({'error': 'Username and password required'}, status=400)
+        try:
+            student = Student.objects.get(username=username)
 
-        # Temporarily store in session
-        request.session['login_username'] = username
-        request.session['login_password'] = password
+            # If password is stored in plaintext (not recommended for production):
+            if student.password == password:
+                request.session['student_id'] = student.id  # Optional: for session tracking
+                return render(request, 'hello.html', {'student': student})
 
-        return redirect('login_check')  # Redirect to GET check view
+            # If using hashed passwords, use this instead:
+            # if check_password(password, student.password):
 
-    return JsonResponse({'error': 'Only POST allowed'}, status=405)
+            else:
+                messages.error(request, "Invalid credentials")
+                return render(request, 'login.html')
+
+        except Student.DoesNotExist:
+            messages.error(request, "Invalid credentials")
+            return render(request, 'login.html')
+
+    return render(request, 'login.html')
 
 def hello(request):
     return render(request, 'hello.html')
-
-def login(request):
-    return render(request, 'login.html')
 
 def signup(request):
     return render(request, 'signup.html')
@@ -52,18 +61,18 @@ def signup(request):
 def success (request):
     return render(request, 'success.html')
 
-
 def login_check(request):
     username = request.session.get('login_username')
     password = request.session.get('login_password')
 
     if not username or not password:
-        return JsonResponse({'error': 'No login data found'}, status=400)
+        return JsonResponse({'error': 'Session expired or missing data'}, status=400)
 
-    user = authenticate(request, username=username, password=password)
-
-    if user is not None:
-        login(request, user)
-        return JsonResponse({'message': 'Login successful'})
-    else:
-        return JsonResponse({'error': 'Invalid credentials'}, status=401)
+    try:
+        student = Student.objects.get(username=username)
+        if check_password(password, student.password):
+            return render(request, 'hello.html', {'student': student})
+        else:
+            return render(request, 'login.html', {'error': 'Invalid credentials'})
+    except Student.DoesNotExist:
+        return render(request, 'login.html', {'error': 'Invalid credentials'})
