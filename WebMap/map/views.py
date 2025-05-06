@@ -4,6 +4,7 @@ from django.http import HttpResponse, JsonResponse
 from .models import Student
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password
+from django.contrib.auth import authenticate, login as auth_login
 
 
 def join(request):
@@ -18,9 +19,9 @@ def join(request):
             print("Email already registered.")
             messages.error(request, "This email is already registered.")
         else:
-            new_user = Student(username=username, email=email, password=password)
-            new_user.save()
-            print(f"New user saved: {new_user}")  # Debug new user object
+            student = Student(username=username, email=email, password=password)
+            student.save()
+            print(f"New user saved: {student}")  # Debug new user object
             return render(request, 'hello.html')
 
     print("Handling GET request.")  # Debug for GET or unsupported methods
@@ -28,27 +29,15 @@ def join(request):
 
 def login(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
+        email = request.POST.get('email')
         password = request.POST.get('password')
+        student = authenticate(request, email=email, password=password)
 
-        try:
-            student = Student.objects.get(username=username)
-
-            # If password is stored in plaintext (not recommended for production):
-            if student.password == password:
-                request.session['student_id'] = student.id  # Optional: for session tracking
-                return render(request, 'hello.html', {'student': student})
-
-            # If using hashed passwords, use this instead:
-            # if check_password(password, student.password):
-
-            else:
-                messages.error(request, "Invalid credentials")
-                return render(request, 'login.html')
-
-        except Student.DoesNotExist:
-            messages.error(request, "Invalid credentials")
-            return render(request, 'login.html')
+    if student:
+        auth_login(request, student)
+        return redirect('hello')  # Redirects to the homepage
+    else:
+        messages.error(request, "Invalid credentials")
 
     return render(request, 'login.html')
 
