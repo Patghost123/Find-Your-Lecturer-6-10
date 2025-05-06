@@ -76,3 +76,6 @@ def login_check(request):
             return render(request, 'login.html', {'error': 'Invalid credentials'})
     except Student.DoesNotExist:
         return render(request, 'login.html', {'error': 'Invalid credentials'})
+
+def custom_map(request):
+    return render(request, 'map.html')
