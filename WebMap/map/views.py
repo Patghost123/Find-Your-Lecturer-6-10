@@ -3,7 +3,9 @@ from django.contrib.auth import authenticate, login as auth_login
 from django.http import HttpResponse, JsonResponse
 from .models import Student
 from django.contrib import messages
-from django.contrib.auth.hashers import make_password,check_password
+from django.contrib.auth.hashers import check_password
+from django.contrib.auth import authenticate, login as auth_login
+
 
 def join(request):
     if request.method == "POST":
@@ -17,34 +19,25 @@ def join(request):
             print("Email already registered.")
             messages.error(request, "This email is already registered.")
         else:
-            hashed_password = make_password(password)
-            new_user = Student(username=username, email=email, password=hashed_password)
-            new_user.save()
-            print(f"New user saved: {new_user}")
-            return render(request, 'hello.html', {'student': new_user})
+            student = Student(username=username, email=email, password=password)
+            student.save()
+            print(f"New user saved: {student}")  # Debug new user object
+            return render(request, 'hello.html')
 
     print("Handling GET request.")
     return render(request, 'join.html')
 
 def login(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
+        email = request.POST.get('email')
         password = request.POST.get('password')
+        student = authenticate(request, email=email, password=password)
 
-        try:
-            student = Student.objects.get(username=username)
-
-            if check_password(password, student.password):
-                request.session['student_id'] = student.id
-                return render(request, 'hello.html', {'student': student})
-
-            else:
-                messages.error(request, "Invalid credentials")
-                return render(request, 'login.html')
-
-        except Student.DoesNotExist:
-            messages.error(request, "Invalid credentials")
-            return render(request, 'login.html')
+    if student:
+        auth_login(request, student)
+        return redirect('hello')  # Redirects to the homepage
+    else:
+        messages.error(request, "Invalid credentials")
 
     return render(request, 'login.html')
 
@@ -78,3 +71,6 @@ def login_check(request):
             return render(request, 'login.html', {'error': 'Invalid credentials'})
     except Student.DoesNotExist:
         return render(request, 'login.html', {'error': 'Invalid credentials'})
+
+def custom_map(request):
+    return render(request, 'map.html')
