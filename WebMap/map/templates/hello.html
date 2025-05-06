@@ -5,6 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Page</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
     <style>
         body {
             margin: 0;
@@ -14,21 +18,11 @@
             color: #ffffff;
         }
 
-        header {
+        header, footer {
+            background-color: rgba(0, 0, 0, 0.7);
             text-align: center;
             padding: 20px;
-            background-color: rgba(0, 0, 0, 0.7);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        header h1 {
-            font-size: 48px;
-            margin: 0;
-        }
-
-        header p {
-            font-size: 18px;
-            margin-top: 10px;
         }
 
         nav {
@@ -55,34 +49,13 @@
             padding: 40px 20px;
         }
 
-        main h2 {
-            font-size: 36px;
-            margin-bottom: 20px;
-        }
-
-        main p {
-            font-size: 20px;
-            max-width: 600px;
-            margin: 0 auto;
-            line-height: 1.6;
-        }
-
-        footer {
-            text-align: center;
-            padding: 20px;
-            background-color: rgba(0, 0, 0, 0.7);
-            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2);
-            color: #cccccc;
-        }
-
-        footer a {
-            color: #ffd700;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        footer a:hover {
-            color: #ffffff;
+        #map {
+            height: 500px;
+            width: 100%;
+            max-width: 1000px;
+            margin: 20px auto;
+            border: 2px solid white;
+            border-radius: 10px;
         }
 
         .signup-button, .login-button, .logout-button {
@@ -137,70 +110,51 @@
     </style>
 </head>
 <body>
-    <!-- Signup Button -->
-    {% if not new_user.is_authenticated %}
-    <button class="signup-button" onclick="window.location.href='/join';">Sign up</button>
-    
-    <!-- Login Button -->
-    <button class="login-button" onclick="window.location.href='/login';">Login</button>
+    {% if user.is_authenticated %}
+        <div class="user-info">
+            <p>Welcome, {{ user.username }}!</p>
+        </div>
+        <form method="POST" action="{% url 'logout' %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="logout-button">Logout</button>
+        </form>
     {% else %}
-    <div class="user-info">
-        <p>Welcome, {{ student.username }}!</p>
-    </div>
-
-    <!-- Logout Button -->
-    <form method="POST" action="{% url 'logout' %}" style="display:inline;">
-        {% csrf_token %}
-        <button type="submit" class="logout-button">Logout</button>
-        <style>
-            .logout-button {
-                position: absolute; /* Fixed position at the top-right */
-                top: 8px;          /* Distance from the top */
-                right: 20px;        /* Distance from the right */
-                background-color: #ff0000; /* Red color for visibility */
-                color: white;             /* Text color */
-                font-size: 16px;          /* Font size */
-                font-weight: bold;        /* Bold text */
-                padding: 10px 15px;       /* Padding for size */
-                border: none;             /* No borders */
-                border-radius: 5px;       /* Rounded corners */
-                cursor: pointer;          /* Pointer cursor on hover */
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
-                transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions */
-            }
-            
-            .logout-button:hover {
-                background-color: #cc0000; /* Slightly darker red when hovering */
-                box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3); /* Enhanced shadow */
-            }
-            
-            .logout-button:focus {
-                outline: none; /* Remove focus outline */
-                box-shadow: 0 0 5px rgba(255, 0, 0, 0.5); /* Glow effect on focus */
-            }
-        </style>            
-    </form>
-{% endif %}
+        <button class="signup-button" onclick="window.location.href='/join';">Sign up</button>
+        <button class="login-button" onclick="window.location.href='/login';">Login</button>
+    {% endif %}
 
     <header>
         <h1>Welcome to Find Your Lecturer</h1>
-        <p>Find you get contact with your lecturers. easily on the go.</p>
+        <p>Find and contact your lecturers easily on the go.</p>
     </header>
 
     <nav>
-
+        <!-- Navigation Links -->
     </nav>
 
     <main>
         <h2>Discover More</h2>
-        <p>
-            
-        </p>
+        <p>Here’s where you can view lecturer locations:</p>
+        <!-- Map container -->
+        <div id="map"></div>
     </main>
 
     <footer>
-        <p> All rights reserved.</p>
+        <p>All rights reserved.</p>
         <p><a href="#contact">Privacy Policy</a> | <a href="#terms">Terms of Service</a></p>
     </footer>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        var map = L.map('map').setView([0, 0], 2);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+        L.marker([51.5, -0.09]).addTo(map)
+            .bindPopup('A sample marker!')
+            .openPopup();
+    </script>
 </body>
 </html>

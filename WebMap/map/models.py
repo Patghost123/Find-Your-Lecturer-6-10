@@ -14,6 +14,7 @@ class StudentManager(BaseUserManager):
         student = self.create_user(email, username, password)
         student.is_staff = True
         student.is_superuser = True
+        student.is_active = True  # Ensure the superuser is active
         student.save(using=self._db)
         return student
 
@@ -21,17 +22,16 @@ class Student(AbstractBaseUser):
     email = models.EmailField(max_length=200, unique=True)
     username = models.CharField(max_length=100, unique=True)
     
-    # Use Django’s built-in password handling
-    password = models.CharField(max_length=128)  # Stored securely via set_password()
-    
+    # Password is handled by AbstractBaseUser, no need to define it again
+    # password = models.CharField(max_length=128)  # Remove this line
+
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
 
     objects = StudentManager()
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
+    USERNAME_FIELD = 'username'
 
     def __str__(self):
         return self.username
