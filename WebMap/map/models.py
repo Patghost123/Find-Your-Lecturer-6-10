@@ -10,8 +10,8 @@ class StudentManager(BaseUserManager):
         student.save(using=self._db)
         return student
 
-    def create_superuser(self, username, password=None):
-        student = self.create_user(username, password)
+    def create_superuser(self, username, email, password=None):
+        student = self.create_user(email=email, username=username, password=password)
         student.is_staff = True
         student.is_superuser = True
         student.is_active = True  # Ensure the superuser is active
@@ -35,4 +35,16 @@ class Student(AbstractBaseUser):
 
     def __str__(self):
         return self.username
+
+class StudentBackend():
+    def authenticate(self, request, username=None, password=None):
+        try:
+            user = Student.objects.get(username=username)
+            if user.check_password(password) and user.is_staff:  # Ensure staff users can log in
+                return user
+        except Student.DoesNotExist:
+            return None
+
+
+
     
