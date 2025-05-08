@@ -5,41 +5,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Find Your Lecturer{% endblock %}</title>
     <style>
+        @import url("https://fonts.googleapis.com/css2?family=Manrope:wght@300;500;700&display=swap");
+
         body { 
-            font-family: Arial, sans-serif; 
+            font-family: "Manrope", sans-serif; 
+            background: linear-gradient(135deg, #1a1f47, #3b8be2); 
             margin: 0; 
             padding: 0; 
+            color: #cfe2f3;
         }
+
+        /* Navbar with refined styling */
         nav { 
-            background: #333; 
-            padding: 10px; 
+            background: rgba(255, 255, 255, 0.12); 
+            padding: 10px 20px; 
             display: flex; 
-            justify-content: flex-start;  /* Aligns items to the left */
+            justify-content: space-between; 
             align-items: center; 
-            position: fixed;  /* Keeps navigation fixed at the top */
-            top: 0;  /* Positions at the very top */
-            left: 0;  /* Aligns to the left */
-            width: 100%;  /* Ensures full width */
-            z-index: 1000;  /* Keeps navbar above other content */
+            position: fixed; 
+            top: 10px; /* Moves it slightly down for a cleaner look */
+            left: 50%; /* Centers the navbar */
+            transform: translateX(-50%);
+            width: auto; /* Prevents it from stretching too wide */
+            border-radius: 10px; /* Adds a softer shape */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4); 
+            z-index: 1000;  
         }
+
         .nav-left { 
             display: flex; 
             gap: 15px; 
-            margin-left: 15px; 
         }
+
+        .nav-right { 
+            display: flex; 
+            gap: 15px; 
+        }
+
         nav a { 
-            color: white; 
+            color: #cfe2f3; 
             text-decoration: none; 
             padding: 10px 15px; 
             font-size: 16px;
+            border-radius: 6px; /* Gives buttons a soft rounded touch */
+            transition: background 0.3s ease-in-out;
         }
+
+        nav a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Container adjustments */
         .container { 
             max-width: 800px; 
             margin: auto; 
             padding: 20px; 
             text-align: center; 
-            margin-top: 60px; /* Adds space below fixed navbar */
+            margin-top: 80px; /* Adjust spacing below navbar */
         }
+
         .error { 
             color: red; 
             font-size: 14px; 
@@ -49,14 +73,18 @@
 <body>
 
     <nav>
+        <!-- Home Button (Left) -->
         <div class="nav-left">
             <a href="{% url 'hello' %}">Home</a>
+        </div>
+
+        <!-- Login & Signup Buttons (Right) -->
+        <div class="nav-right">
             {% if not request.user.is_authenticated %}
                 <a href="{% url 'join' %}">Sign Up</a>
                 <a href="{% url 'login' %}">Login</a>
             {% endif %}
-        </div>
-        <div class="nav-right">
+
             {% if request.user.is_authenticated %}
                 <a href="{% url 'profile' %}">Profile</a>
                 <a href="{% url 'logout' %}">Logout</a>
