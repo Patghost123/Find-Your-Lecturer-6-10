@@ -35,16 +35,16 @@ def login(request):
     username = request.POST.get("username", "").strip()
     password = request.POST.get("password", "").strip()
 
-    # Attempt authentication
+    # Attempt authentication using Django's built-in `authenticate`
     user = authenticate(request, username=username, password=password)
 
     # Handle authentication result
     if user is not None:
         print("User authenticated:", user.username)  # Debugging output
-        login(request, user)
+        auth_login(request, user)  # Logs the user in
         print("Redirecting now...")  # Debugging output
-        return redirect("/hello/")  # 🚀 Redirect after successful login
-    
+        return redirect("hello")  # 🚀 Redirect after successful login
+
     print("Login failed!")  # Debugging output
     return render(request, "login.html", {"error": "Invalid username or password!"})
 
