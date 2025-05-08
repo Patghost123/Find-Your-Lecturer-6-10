@@ -2,36 +2,52 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as auth_login
 from .models import Student
 from django.contrib import messages
+from django.contrib.auth.hashers import make_password
 
 def join(request):
-    if request.method == "POST":
-        username = request.POST.get('username')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
+    if request.method != "POST":  # Guard clause for GET requests
+        return render(request, "join.html")  
 
-        if Student.objects.filter(email=email).exists():
-            messages.error(request, "This email is already registered.")
-        else:
-            student = Student(username=username, email=email)
-            student.set_password(password)  
-            student.save()
-            # Log the user in immediately after signup
-            auth_login(request, student)
-            return redirect('hello')  # Redirect to the 'hello' page instead of rendering 'hello.html'
-        
-    return render(request, 'join.html')
+    # Guard clause for missing input
+    username = request.POST.get("username", "").strip()
+    email = request.POST.get("email", "").strip()
+    password = request.POST.get("password", "").strip()
+
+    if not username or not email or not password:
+        return render(request, "join.html", {"error": "All fields are required!"})
+
+    if Student.objects.filter(username=username).exists():
+        return render(request, "join.html", {"error": "Username already taken."})
+
+    # Main logic
+    student = Student(username=username, email=email, password=make_password(password))
+    student.save()
+    
+    return redirect("/hello/")
+
 
 def login(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        student = authenticate(request, username=username, password=password)
-        if student is not None:
-            auth_login(request, student)
-            return redirect('hello')  # Redirect to the 'hello' page after login
-        else:
-            messages.error(request, "Invalid credentials")
-    return render(request, 'login.html')
+    # Guard clause: Immediately return the login page for GET requests
+    if request.method != "POST":
+        return render(request, "login.html")  
+
+    # Extract login credentials
+    username = request.POST.get("username", "").strip()
+    password = request.POST.get("password", "").strip()
+
+    # Attempt authentication
+    user = authenticate(request, username=username, password=password)
+
+    # Handle authentication result
+    if user is not None:
+        print("User authenticated:", user.username)  # Debugging output
+        login(request, user)
+        print("Redirecting now...")  # Debugging output
+        return redirect("/hello/")  # 🚀 Redirect after successful login
+    
+    print("Login failed!")  # Debugging output
+    return render(request, "login.html", {"error": "Invalid username or password!"})
+
 
 def hello(request):
     # Use 'request.user' to check if the user is authenticated

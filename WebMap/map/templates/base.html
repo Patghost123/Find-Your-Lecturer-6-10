@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Find Your Lecturer{% endblock %}</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+        }
+        nav { 
+            background: #333; 
+            padding: 10px; 
+            display: flex; 
+            justify-content: flex-start;  /* Aligns items to the left */
+            align-items: center; 
+            position: fixed;  /* Keeps navigation fixed at the top */
+            top: 0;  /* Positions at the very top */
+            left: 0;  /* Aligns to the left */
+            width: 100%;  /* Ensures full width */
+            z-index: 1000;  /* Keeps navbar above other content */
+        }
+        .nav-left { 
+            display: flex; 
+            gap: 15px; 
+            margin-left: 15px; 
+        }
+        nav a { 
+            color: white; 
+            text-decoration: none; 
+            padding: 10px 15px; 
+            font-size: 16px;
+        }
+        .container { 
+            max-width: 800px; 
+            margin: auto; 
+            padding: 20px; 
+            text-align: center; 
+            margin-top: 60px; /* Adds space below fixed navbar */
+        }
+        .error { 
+            color: red; 
+            font-size: 14px; 
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-left">
+            <a href="{% url 'hello' %}">Home</a>
+            {% if not request.user.is_authenticated %}
+                <a href="{% url 'join' %}">Sign Up</a>
+                <a href="{% url 'login' %}">Login</a>
+            {% endif %}
+        </div>
+        <div class="nav-right">
+            {% if request.user.is_authenticated %}
+                <a href="{% url 'profile' %}">Profile</a>
+                <a href="{% url 'logout' %}">Logout</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+</body>
+</html>

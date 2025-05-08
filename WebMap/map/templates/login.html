@@ -1,16 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    {% if messages %}
-    <ul>
-        {% for message in messages %}
-            <li style="color:red;">{{ message }}</li>
-        {% endfor %}
-    </ul>
-{% endif %}
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
     <style>
         /* Home Button Styling */
         .home-button {
@@ -35,16 +27,6 @@
         }
 
         /* Login Page Styling */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f5f5f5;
-        }
         .login-container {
             text-align: center;
             background: #ffffff;
@@ -52,6 +34,7 @@
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             width: 300px;
+            margin: auto;
         }
         .login-container h1 {
             font-size: 24px;
@@ -103,15 +86,23 @@
             font-size: 14px;
         }
     </style>
-</head>
-<body>
+
     <!-- Home Button -->
-    <a href="/hello" class="home-button">Home</a>
+    <a href="{% url 'hello' %}" class="home-button">Home</a>
     
     <!-- Login Container -->
     <div class="login-container">
         <h1>Login</h1>
-        <form method="POST" action="{% url 'login' %}">
+
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li style="color:red;">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <form action="{% url 'login' %}" method="POST">
             {% csrf_token %}
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" required><br><br>
@@ -122,5 +113,4 @@
             <button type="submit">Login</button>
         </form>
     </div>
-</body>
-</html>
+{% endblock %}

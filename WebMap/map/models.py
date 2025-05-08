@@ -1,50 +1,38 @@
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
+from django.contrib.auth.hashers import make_password
 
 class StudentManager(BaseUserManager):
-    def create_user(self, email, username, password=None):
+    def create_user(self, username, email, password=None):
         if not email:
-            raise ValueError("Email is required")
-        student = self.model(email=email, username=username)
-        student.set_password(password)  # Hash password before saving
-        student.save(using=self._db)
-        return student
+            raise ValueError("Users must have an email address")
 
-    def create_superuser(self, username, email, password=None):
-        student = self.create_user(email=email, username=username, password=password)
-        student.is_staff = True
-        student.is_superuser = True
-        student.is_active = True  # Ensure the superuser is active
-        student.save(using=self._db)
-        return student
+        user = self.model(username=username, email=email)
+        user.set_password(password)  # Secure password hashing
+        user.is_staff = False  # Prevent normal users from accessing admin
+        user.is_active = True  # Needed for authentication
+        user.save(using=self._db)
+        return user
 
-class Student(AbstractBaseUser):
-    email = models.EmailField(max_length=200, unique=True)
-    username = models.CharField(max_length=100, unique=True)
-    
-    # Password is handled by AbstractBaseUser, no need to define it again
-    # password = models.CharField(max_length=128)  # Remove this line
+    def create_superuser(self, username, email, password):
+        user = self.create_user(username, email, password)
+        user.is_staff = True  # Allows admin panel access
+        user.is_superuser = True  # Grants full permissions
+        user.save(using=self._db)
+        return user
 
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    is_superuser = models.BooleanField(default=False)
+class Student(AbstractBaseUser, PermissionsMixin):
+    username = models.CharField(unique=True, max_length=100)
+    email = models.EmailField(unique=True)
+    password = models.CharField(max_length=128)
+
+    is_staff = models.BooleanField(default=False)  # Required for admin access
+    is_active = models.BooleanField(default=True)  # Needed for authentication
 
     objects = StudentManager()
 
-    USERNAME_FIELD = 'username'
+    USERNAME_FIELD = "username"
+    REQUIRED_FIELDS = ["email"]
 
-    def __str__(self):
-        return self.username
-
-class StudentBackend():
-    def authenticate(self, request, username=None, password=None):
-        try:
-            user = Student.objects.get(username=username)
-            if user.check_password(password) and user.is_staff:  # Ensure staff users can log in
-                return user
-        except Student.DoesNotExist:
-            return None
-
-
-
-    
+    def set_password(self, raw_password):
+        self.password = make_password(raw_password)
