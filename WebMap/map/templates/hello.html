@@ -147,13 +147,13 @@
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
-        var map = L.map('map').setView([0, 0], 2);
+        var map = L.map('map').setView([2.929084914685021, 101.64058288081662], 19);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 18,
+            maxZoom: 25,
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
-        L.marker([51.5, -0.09]).addTo(map)
-            .bindPopup('A sample marker!')
+        L.marker([2.929084914685021, 101.64058288081662]).addTo(map)
+            .bindPopup('You are here!')
             .openPopup();
     </script>
 </body>
