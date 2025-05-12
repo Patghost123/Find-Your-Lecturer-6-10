@@ -1,9 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as auth_login
-from .models import Student, Room
+from .models import Student, Lecturer
 from django.contrib.auth.hashers import make_password
-from django.http import JsonResponse
-from django.http import Http404
 
 def join(request):
     if request.method != "POST":  # Guard clause for GET requests
@@ -55,33 +53,28 @@ def hello(request):
 
 def success(request):
     return render(request, 'success.html')
-
-def room_detail(request, room_code):
-    try:
-        room = Room.objects.select_related('lecturer').get(code=room_code)
-        data = {
-            "code": room.code,
-            "name": room.name,
-            "x": room.x,
-            "y": room.y,
-            "floor": room.floor,
-            "lecturer": {
-                "name": room.lecturer.name,
-                "position": room.lecturer.position,
-                "room_number": room.lecturer.room_number,
-                "phone_number": room.lecturer.phone_number,
-                "email": room.lecturer.email,
-                "profile_url": room.lecturer.profile_url,
-                "office_hours": room.lecturer.office_hours,
-            } if room.lecturer else None
-        }
-        return JsonResponse(data)
-    except Room.DoesNotExist:
-        return JsonResponse({"error": "Room not found"}, status=404)
     
 def floor_map(request, floor_number=1):
-    if floor_number not in range(1, 5):  # allow floors 1 to 4
-        raise Http404("Floor not found")
+    if floor_number not in [1, 2, 3]:
+        return render(request, '404.html', status=404)
 
-    template_name = f'floor{floor_number}map.html'
-    return render(request, template_name, {'floor': floor_number})
+    # Filter lecturers by floor if needed (you'll need a `floor` field)
+    lecturers = Lecturer.objects.all()  # Or filter by floor if applicable
+
+    lecturer_data = {
+        lecturer.room_number.strip().upper(): {
+            'name': lecturer.name,
+            'room_number': lecturer.room_number,
+            'position': lecturer.position,
+            'email': lecturer.email,
+            'phone': lecturer.phone,
+            'faculty': lecturer.faculty,
+            'profile_url': lecturer.profile_url,
+        }
+        for lecturer in lecturers if lecturer.room_number
+    }
+
+    return render(request, f'floor{floor_number}map.html', {
+        'floor': floor_number,
+        'lecturer_data': lecturer_data,
+    })

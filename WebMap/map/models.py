@@ -38,24 +38,14 @@ class Student(AbstractBaseUser, PermissionsMixin):
         self.password = make_password(raw_password)
 
 class Lecturer(models.Model):
-    name = models.CharField(max_length=100)
-    position = models.CharField(max_length=100)
-    room_number = models.CharField(max_length=10, unique=True)
-    phone_number = models.CharField(max_length=100)
-    email = models.EmailField()
-    profile_url = models.URLField()
+    name = models.CharField(max_length=255)
+    position = models.CharField(max_length=255, blank=True)
+    faculty = models.CharField(max_length=255, blank=True)
+    room_number = models.CharField(max_length=50, blank=True)  
+    phone = models.CharField(max_length=50, blank=True)
+    email = models.EmailField(blank=True)
+    profile_url = models.URLField(blank=True)
     office_hours = models.TextField()
-
-    def __str__(self):
-        return self.name
-
-class Room(models.Model):
-    code = models.CharField(max_length=10, unique=True)
-    name = models.CharField(max_length=100)
-    floor = models.IntegerField()
-    x = models.FloatField()  # Image X coordinate
-    y = models.FloatField()  # Image Y coordinate
-    lecturer = models.ForeignKey(Lecturer, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.name

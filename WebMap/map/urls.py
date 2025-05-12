@@ -12,7 +12,6 @@ urlpatterns = [
     path('success/', views.success, name="success"),
     path('logout/', auth_views.LogoutView.as_view(next_page='hello'), name='logout'),
     path('map/<int:floor_number>/', views.floor_map, name='floor_map'),
-    path('room/<str:room_code>/', views.room_detail, name='room_detail'),
 ]
 
 if settings.DEBUG:
