@@ -53,13 +53,12 @@ def home(request):
 
 def success(request):
     return render(request, 'success.html')
-<<<<<<< HEAD
+
 
 def students_list(request):
     students = Student.objects.all()
     students = Student.objects.exclude(username__in=["FCILecturer", "adminfindyourlecturer"]).exclude(email__in=["FCILecturer@gmail.com", "adminfindyourlecturer@gmail.com"])
     return render(request, "students.html", {"students": students})
-=======
     
 def floor_map(request, floor_number=1):
     if floor_number not in [1, 2, 3]:
@@ -85,4 +84,3 @@ def floor_map(request, floor_number=1):
         'floor': floor_number,
         'lecturer_data': lecturer_data,
     })
->>>>>>> ecd54e5320f727201f537867fcb4d9ccc1fce039
