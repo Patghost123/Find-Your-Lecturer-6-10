@@ -36,3 +36,26 @@ class Student(AbstractBaseUser, PermissionsMixin):
 
     def set_password(self, raw_password):
         self.password = make_password(raw_password)
+
+class Lecturer(models.Model):
+    name = models.CharField(max_length=100)
+    position = models.CharField(max_length=100)
+    room_number = models.CharField(max_length=10, unique=True)
+    phone_number = models.CharField(max_length=100)
+    email = models.EmailField()
+    profile_url = models.URLField()
+    office_hours = models.TextField()
+
+    def __str__(self):
+        return self.name
+
+class Room(models.Model):
+    code = models.CharField(max_length=10, unique=True)
+    name = models.CharField(max_length=100)
+    floor = models.IntegerField()
+    x = models.FloatField()  # Image X coordinate
+    y = models.FloatField()  # Image Y coordinate
+    lecturer = models.ForeignKey(Lecturer, on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return self.name

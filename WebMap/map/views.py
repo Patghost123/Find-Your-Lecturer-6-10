@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as auth_login
-from .models import Student
-from django.contrib import messages
+from .models import Student, Room
 from django.contrib.auth.hashers import make_password
+from django.http import JsonResponse
+from django.http import Http404
 
 def join(request):
     if request.method != "POST":  # Guard clause for GET requests
@@ -54,3 +55,33 @@ def hello(request):
 
 def success(request):
     return render(request, 'success.html')
+
+def room_detail(request, room_code):
+    try:
+        room = Room.objects.select_related('lecturer').get(code=room_code)
+        data = {
+            "code": room.code,
+            "name": room.name,
+            "x": room.x,
+            "y": room.y,
+            "floor": room.floor,
+            "lecturer": {
+                "name": room.lecturer.name,
+                "position": room.lecturer.position,
+                "room_number": room.lecturer.room_number,
+                "phone_number": room.lecturer.phone_number,
+                "email": room.lecturer.email,
+                "profile_url": room.lecturer.profile_url,
+                "office_hours": room.lecturer.office_hours,
+            } if room.lecturer else None
+        }
+        return JsonResponse(data)
+    except Room.DoesNotExist:
+        return JsonResponse({"error": "Room not found"}, status=404)
+    
+def floor_map(request, floor_number=1):
+    if floor_number not in range(1, 5):  # allow floors 1 to 4
+        raise Http404("Floor not found")
+
+    template_name = f'floor{floor_number}map.html'
+    return render(request, template_name, {'floor': floor_number})

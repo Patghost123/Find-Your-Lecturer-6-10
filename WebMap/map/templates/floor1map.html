@@ -1,0 +1,194 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Find Your Lecturer</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #6a11cb, #2575fc);
+      color: #ffffff;
+    }
+
+    header, footer {
+      background-color: rgba(0, 0, 0, 0.7);
+      text-align: center;
+      padding: 20px;
+    }
+
+    nav {
+      text-align: center;
+      margin: 10px 0;
+    }
+
+    nav a {
+      color: white;
+      margin: 0 15px;
+      text-decoration: none;
+    }
+
+    .indoor-map {
+      max-width: 90%;
+      margin: 20px auto;
+      border: 2px solid white;
+      border-radius: 10px;
+      background: white;
+      height: 500px;
+      text-align: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #svg-container {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      pointer-events: auto;
+    }
+
+    #sidebar {
+      position: fixed;
+      right: 0;
+      top: 0;
+      width: 300px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 20px;
+      display: none;
+      height: 100%;
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    #sidebar button {
+      margin-top: 20px;
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px;
+      border: none;
+      cursor: pointer;
+    }
+
+    #sidebar button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Find Your Lecturer</h1>
+  <p>Locate lecturers using the indoor building floor plan.</p>
+</header>
+
+<nav>
+  {% if user.is_authenticated %}
+    <span>Welcome, {{ user.username }}!</span>
+    <form method="POST" action="{% url 'logout' %}" style="display:inline;">
+      {% csrf_token %}
+      <button type="submit" style="background:none;border:none;color:white;text-decoration:underline;">Logout</button>
+    </form>
+  {% else %}
+    <a href="/login">Login</a>
+    <a href="/join">Sign Up</a>
+  {% endif %}
+</nav>
+
+<main style="text-align:center;">
+  <div class="indoor-map">
+    <h2 style="color:black;">Indoor Floor 1 Map</h2>
+    <div id="svg-container">
+      <div id="svg-map-loading" style="color:black;">Loading map...</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>&copy; 2025 Find Your Lecturer</p>
+</footer>
+
+<!-- Sidebar for displaying lecturer details -->
+<div id="sidebar">
+  <h3>Lecturer Details</h3>
+  <p id="lecturer-name">Name: </p>
+  <p id="lecturer-office">Office: </p>
+  <button onclick="closeSidebar()">Close</button>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // Load SVG from static folder
+  fetch("{% static 'maps/fcifloor1.svg' %}")
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("Failed to fetch the SVG, status: " + res.status);
+      }
+      return res.text();
+    })
+    .then(svgText => {
+      console.log("SVG loaded:", svgText);  // Log the SVG content for debugging
+      document.getElementById('svg-container').innerHTML = svgText;
+
+      const rooms = document.querySelectorAll('svg [id^="BR"], svg [id^="CQAR"]');
+
+      rooms.forEach(function (room) {
+        room.style.cursor = 'pointer';
+        room.addEventListener('click', function () {
+          const roomId = room.id;
+          openSidebar(roomId);
+        });
+      });
+
+      // Sidebar functions
+      function openSidebar(roomId) {
+        document.getElementById('sidebar').style.display = 'block';
+        const lecturerDetails = getLecturerDetails(roomId);
+        document.getElementById('lecturer-name').innerText = 'Name: ' + lecturerDetails.name;
+        document.getElementById('lecturer-office').innerText = 'Office: ' + lecturerDetails.office;
+      }
+
+      window.closeSidebar = function () {
+        document.getElementById('sidebar').style.display = 'none';
+      };
+
+      function getLecturerDetails(roomId) {
+        const lecturers = {
+          BR1015: { name: "Dr. Aisha Khan", office: "BR1015" },
+          BR1026: { name: "Prof. Nelson", office: "BR1026" },
+          CQAR1001: { name: "Dr. Patel", office: "CQAR1001" },
+        };
+        return lecturers[roomId] || { name: "Unknown", office: "Unknown" };
+      }
+
+      // Add a red marker to BR1015 (adjust coordinates as needed)
+      const marker = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      marker.setAttribute("cx", "250"); // <-- Adjust based on BR1015 position
+      marker.setAttribute("cy", "180");
+      marker.setAttribute("r", "8");
+      marker.setAttribute("fill", "red");
+      marker.setAttribute("id", "marker-br1015");
+      marker.style.cursor = 'pointer';
+      marker.addEventListener('click', function () {
+        openSidebar('BR1015');
+      });
+
+      document.querySelector('svg').appendChild(marker);
+    })
+    .catch(err => {
+      console.error("SVG load error:", err);
+      document.getElementById('svg-container').innerHTML = "<p style='color:red;'>Failed to load map. Error: " + err.message + "</p>";
+    });
+});
+</script>
+
+</body>
+</html>
