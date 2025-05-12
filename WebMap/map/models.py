@@ -36,3 +36,16 @@ class Student(AbstractBaseUser, PermissionsMixin):
 
     def set_password(self, raw_password):
         self.password = make_password(raw_password)
+
+class Lecturer(models.Model):
+    name = models.CharField(max_length=255)
+    position = models.CharField(max_length=255, blank=True)
+    faculty = models.CharField(max_length=255, blank=True)
+    room_number = models.CharField(max_length=50, blank=True)  
+    phone = models.CharField(max_length=50, blank=True)
+    email = models.EmailField(blank=True)
+    profile_url = models.URLField(blank=True)
+    office_hours = models.TextField()
+
+    def __str__(self):
+        return self.name

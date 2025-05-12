@@ -1,0 +1,294 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Find Your Lecturer</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #6a11cb, #2575fc);
+      color: #ffffff;
+    }
+
+    header, footer {
+      background-color: rgba(0, 0, 0, 0.7);
+      text-align: center;
+      padding: 20px;
+    }
+
+    nav {
+      text-align: center;
+      margin: 10px 0;
+    }
+
+    nav a {
+      color: white;
+      margin: 0 15px;
+      text-decoration: none;
+    }
+
+    .indoor-map {
+      max-width: 55%;
+      height: 800px;
+      margin: 50px auto;
+      border: 2px solid white;
+      border-radius: 50px;
+      background: white;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #svg-container {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      pointer-events: auto;
+    }
+
+    #sidebar {
+      position: fixed;
+      right: 0;
+      top: 0;
+      width: 300px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 20px;
+      display: none;
+      height: 100%;
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    #sidebar button {
+      margin-top: 20px;
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px;
+      border: none;
+      cursor: pointer;
+    }
+
+    #sidebar button:hover {
+      background-color: #45a049;
+    }
+
+    #debug-panel {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      max-height: 200px;
+      overflow-y: auto;
+      padding: 10px;
+      font-size: 12px;
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Find Your Lecturer</h1>
+  <p>Locate lecturers using the indoor building floor plan.</p>
+</header>
+
+<nav>
+  {% if user.is_authenticated %}
+    <span>Welcome, {{ user.username }}!</span>
+    <form method="POST" action="{% url 'logout' %}" style="display:inline;">
+      {% csrf_token %}
+      <button type="submit" style="background:none;border:none;color:white;text-decoration:underline;">Logout</button>
+    </form>
+  {% else %}
+    <a href="/login">Login</a>
+    <a href="/join">Sign Up</a>
+  {% endif %}
+</nav>
+
+<main style="text-align:center;">
+  <div class="indoor-map">
+    <h2 style="color:black;">Indoor Floor 1 Map</h2>
+    <div id="svg-container">
+      <div id="svg-map-loading" style="color:black;">Loading map...</div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>&copy; 2025 Find Your Lecturer</p>
+</footer>
+
+<!-- Sidebar -->
+<div id="sidebar">
+  <h3>Lecturer Details</h3>
+  <p id="lecturer-name">Name: </p>
+  <p id="lecturer-office">Office: </p>
+  <p id="lecturer-position">Position: </p>
+  <p id="lecturer-email">Email: </p>
+  <p id="lecturer-phone">Phone: </p>
+  <p id="lecturer-faculty">Faculty: </p>
+  <a id="lecturer-profile" href="#" target="_blank">View Profile</a>
+  <button onclick="closeSidebar()">Close</button>
+</div>
+
+<!-- Debug Panel -->
+<div id="debug-panel"></div>
+
+<!-- Embedded JSON data -->
+{{ lecturer_data|json_script:"lecturer-data" }}
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  fetch("{% static 'maps/fcifloor1.svg' %}")
+    .then(res => res.text())
+    .then(svgText => {
+      const container = document.getElementById('svg-container');
+      container.innerHTML = svgText;
+
+      const svg = container.querySelector('svg');
+      const svgOriginal = { width: 1000, height: 1000 };
+      let viewBox = { x: 0, y: 0, width: svgOriginal.width, height: svgOriginal.height };
+      const zoomLimits = { min: svgOriginal.width * 0.5, max: svgOriginal.width };
+
+      svg.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
+
+      container.addEventListener('wheel', function (e) {
+        e.preventDefault();
+        const zoomFactor = 1.1;
+        const scale = e.deltaY > 0 ? zoomFactor : 1 / zoomFactor;
+
+        const mx = e.offsetX / container.clientWidth * viewBox.width + viewBox.x;
+        const my = e.offsetY / container.clientHeight * viewBox.height + viewBox.y;
+
+        const newWidth = viewBox.width * scale;
+        const newHeight = viewBox.height * scale;
+
+        if (newWidth < zoomLimits.min || newWidth > zoomLimits.max) return;
+
+        viewBox.width = newWidth;
+        viewBox.height = newHeight;
+        viewBox.x = mx - (mx - viewBox.x) * scale;
+        viewBox.y = my - (my - viewBox.y) * scale;
+
+        clampViewBox();
+        svg.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
+      });
+
+      let isPanning = false;
+      let start = { x: 0, y: 0 };
+
+      container.addEventListener('mousedown', function (e) {
+        isPanning = true;
+        start.x = e.clientX;
+        start.y = e.clientY;
+      });
+
+      container.addEventListener('mousemove', function (e) {
+        if (!isPanning) return;
+        const dx = (e.clientX - start.x) * viewBox.width / container.clientWidth;
+        const dy = (e.clientY - start.y) * viewBox.height / container.clientHeight;
+
+        viewBox.x -= dx;
+        viewBox.y -= dy;
+
+        start.x = e.clientX;
+        start.y = e.clientY;
+
+        clampViewBox();
+        svg.setAttribute('viewBox', `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`);
+      });
+
+      container.addEventListener('mouseup', () => isPanning = false);
+      container.addEventListener('mouseleave', () => isPanning = false);
+
+      function clampViewBox() {
+        if (viewBox.width < zoomLimits.min) viewBox.width = zoomLimits.min;
+        if (viewBox.width > zoomLimits.max) viewBox.width = zoomLimits.max;
+
+        const aspectRatio = svgOriginal.height / svgOriginal.width;
+        viewBox.height = viewBox.width * aspectRatio;
+
+        if (viewBox.x < 0) viewBox.x = 0;
+        if (viewBox.y < 0) viewBox.y = 0;
+        if (viewBox.x + viewBox.width > svgOriginal.width)
+          viewBox.x = svgOriginal.width - viewBox.width;
+        if (viewBox.y + viewBox.height > svgOriginal.height)
+          viewBox.y = svgOriginal.height - viewBox.height;
+      }
+
+      const lecturers = JSON.parse(document.getElementById('lecturer-data').textContent);
+      console.log("Loaded lecturer data:", lecturers);
+      console.log("Total lecturer entries:", Object.keys(lecturers).length);
+
+      const rooms = svg.querySelectorAll('[id^="BR"], [id^="CQAR"]');
+      const unmatchedRooms = [];
+
+      rooms.forEach(room => {
+        const roomId = room.id;
+        const matched = lecturers.hasOwnProperty(roomId);
+
+        if (matched) {
+          room.style.stroke = "green";
+          room.style.strokeWidth = "4px";
+          console.log(`Matched room: ${roomId}`);
+        } else {
+          room.style.stroke = "red";
+          room.style.strokeWidth = "2px";
+          unmatchedRooms.push(roomId);
+          console.warn(`No lecturer for room: ${roomId}`);
+        }
+
+        room.style.cursor = 'pointer';
+        room.addEventListener('click', () => openSidebar(roomId));
+      });
+
+      document.getElementById("debug-panel").innerHTML =
+        "<strong>Unmatched Rooms:</strong><br>" + unmatchedRooms.join("<br>");
+
+      function openSidebar(roomId) {
+        console.log('Clicked room ID:', roomId);
+        const lecturer = lecturers[roomId] || {
+          name: "Unknown",
+          office: "Unknown",
+          position: "Unknown",
+          email: "Unknown",
+          phone: "Unknown",
+          faculty: "Unknown",
+          profile_url: "#"
+        };
+
+        document.getElementById('sidebar').style.display = 'block';
+        document.getElementById('lecturer-name').innerText = 'Name: ' + lecturer.name;
+        document.getElementById('lecturer-office').innerText = 'Office: ' + lecturer.office;
+        document.getElementById('lecturer-position').innerText = 'Position: ' + lecturer.position;
+        document.getElementById('lecturer-email').innerText = 'Email: ' + lecturer.email;
+        document.getElementById('lecturer-phone').innerText = 'Phone: ' + lecturer.phone;
+        document.getElementById('lecturer-faculty').innerText = 'Faculty: ' + lecturer.faculty;
+
+        const profileLink = document.getElementById('lecturer-profile');
+        profileLink.href = lecturer.profile_url;
+        profileLink.innerText = lecturer.profile_url ? 'View Profile' : 'No Profile Available';
+      }
+
+      window.closeSidebar = function () {
+        document.getElementById('sidebar').style.display = 'none';
+      };
+    })
+    .catch(err => {
+      document.getElementById('svg-container').innerHTML = "<p style='color:red;'>Failed to load map.</p>";
+      console.error("SVG load error:", err);
+    });
+});
+</script>
+
+</body>
+</html>

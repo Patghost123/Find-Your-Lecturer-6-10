@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as auth_login
-from .models import Student
-from django.contrib import messages
+from .models import Student, Lecturer
 from django.contrib.auth.hashers import make_password
 
 def join(request):
@@ -54,8 +53,36 @@ def home(request):
 
 def success(request):
     return render(request, 'success.html')
+<<<<<<< HEAD
 
 def students_list(request):
     students = Student.objects.all()
     students = Student.objects.exclude(username__in=["FCILecturer", "adminfindyourlecturer"]).exclude(email__in=["FCILecturer@gmail.com", "adminfindyourlecturer@gmail.com"])
     return render(request, "students.html", {"students": students})
+=======
+    
+def floor_map(request, floor_number=1):
+    if floor_number not in [1, 2, 3]:
+        return render(request, '404.html', status=404)
+
+    # Filter lecturers by floor if needed (you'll need a `floor` field)
+    lecturers = Lecturer.objects.all()  # Or filter by floor if applicable
+
+    lecturer_data = {
+        lecturer.room_number.strip().upper(): {
+            'name': lecturer.name,
+            'room_number': lecturer.room_number,
+            'position': lecturer.position,
+            'email': lecturer.email,
+            'phone': lecturer.phone,
+            'faculty': lecturer.faculty,
+            'profile_url': lecturer.profile_url,
+        }
+        for lecturer in lecturers if lecturer.room_number
+    }
+
+    return render(request, f'floor{floor_number}map.html', {
+        'floor': floor_number,
+        'lecturer_data': lecturer_data,
+    })
+>>>>>>> ecd54e5320f727201f537867fcb4d9ccc1fce039

@@ -1,7 +1,12 @@
 from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
+<<<<<<< HEAD
 from map.views import students_list
+=======
+from django.conf import settings
+from django.conf.urls.static import static
+>>>>>>> ecd54e5320f727201f537867fcb4d9ccc1fce039
 
 urlpatterns = [
     path('', views.home, name="home"),
@@ -9,6 +14,15 @@ urlpatterns = [
     path('login/', views.login, name="login"),
     path('home/', views.home, name="home"),
     path('success/', views.success, name="success"),
+<<<<<<< HEAD
     path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
     path("students/", views.students_list, name="students_list"),
 ]
+=======
+    path('logout/', auth_views.LogoutView.as_view(next_page='hello'), name='logout'),
+    path('map/<int:floor_number>/', views.floor_map, name='floor_map'),
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+>>>>>>> ecd54e5320f727201f537867fcb4d9ccc1fce039
