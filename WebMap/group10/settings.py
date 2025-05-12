@@ -125,12 +125,9 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'map.Student'
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  
-<<<<<<< HEAD
 LOGIN_REDIRECT_URL = "/home/" 
 LOGOUT_REDIRECT_URL = "/login/"
-=======
 LOGIN_REDIRECT_URL = "/hello/" 
 LOGOUT_REDIRECT_URL = "/login/"
 STATICFILES_DIRS = [ BASE_DIR / "static", ]
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
->>>>>>> ecd54e5320f727201f537867fcb4d9ccc1fce039
