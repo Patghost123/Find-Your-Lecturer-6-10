@@ -43,14 +43,13 @@ def login(request):
         print("User authenticated:", user.username)  # Debugging output
         auth_login(request, user)  # Logs the user in
         print("Redirecting now...")  # Debugging output
-        return redirect("hello")  # 🚀 Redirect after successful login
+        return redirect("hello")  # Redirect after successful login
 
     print("Login failed!")  # Debugging output
     return render(request, "login.html", {"error": "Invalid username or password!"})
 
 
 def hello(request):
-    # Use 'request.user' to check if the user is authenticated
     return render(request, 'hello.html', {'student': request.user if request.user.is_authenticated else None})
 
 def success(request):
