@@ -107,6 +107,28 @@
             font-size: 18px;
             font-weight: bold;
         }
+
+/* restricted button for lecturer use */
+        .restricted-button {
+            position: absolute;
+            top: 30px; /* Align with the user info */
+            left: 250px;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+            background-color: #008CBA; /* Stylish blue */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+        .restricted-button:hover {
+            background-color: #005f7f; /* Darker shade on hover */
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3); /* Slightly larger shadow */
+}
     </style>
 </head>
 <body>
@@ -118,6 +140,11 @@
             {% csrf_token %}
             <button type="submit" class="logout-button">Logout</button>
         </form>
+
+        {% if user.username == "FCILecturer" %}
+            <button class="restricted-button" onclick="window.location.href='/students';">View Student List</button>
+        {% endif %}
+
     {% else %}
         <button class="signup-button" onclick="window.location.href='/join';">Sign up</button>
         <button class="login-button" onclick="window.location.href='/login';">Login</button>

@@ -23,7 +23,7 @@ def join(request):
     student = Student(username=username, email=email, password=make_password(password))
     student.save()
     
-    return redirect("/hello/")
+    return redirect("/login/")
 
 
 def login(request):
@@ -43,14 +43,19 @@ def login(request):
         print("User authenticated:", user.username)  # Debugging output
         auth_login(request, user)  # Logs the user in
         print("Redirecting now...")  # Debugging output
-        return redirect("hello")  # Redirect after successful login
+        return redirect("home")  # Redirect after successful login
 
     print("Login failed!")  # Debugging output
     return render(request, "login.html", {"error": "Invalid username or password!"})
 
 
-def hello(request):
-    return render(request, 'hello.html', {'student': request.user if request.user.is_authenticated else None})
+def home(request):
+    return render(request, 'home.html', {'student': request.user if request.user.is_authenticated else None})
 
 def success(request):
     return render(request, 'success.html')
+
+def students_list(request):
+    students = Student.objects.all()
+    students = Student.objects.exclude(username__in=["FCILecturer", "adminfindyourlecturer"]).exclude(email__in=["FCILecturer@gmail.com", "adminfindyourlecturer@gmail.com"])
+    return render(request, "students.html", {"students": students})
