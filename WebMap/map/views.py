@@ -54,7 +54,6 @@ def home(request):
 def success(request):
     return render(request, 'success.html')
 
-
 def students_list(request):
     students = Student.objects.all()
     students = Student.objects.exclude(username__in=["FCILecturer", "adminfindyourlecturer"]).exclude(email__in=["FCILecturer@gmail.com", "adminfindyourlecturer@gmail.com"])
@@ -64,8 +63,8 @@ def floor_map(request, floor_number=1):
     if floor_number not in [1, 2, 3]:
         return render(request, '404.html', status=404)
 
-    # Filter lecturers by floor if needed (you'll need a `floor` field)
-    lecturers = Lecturer.objects.all()  # Or filter by floor if applicable
+    # Only include lecturers with non-empty room_number
+    lecturers = Lecturer.objects.all() 
 
     lecturer_data = {
         lecturer.room_number.strip().upper(): {
@@ -77,10 +76,10 @@ def floor_map(request, floor_number=1):
             'faculty': lecturer.faculty,
             'profile_url': lecturer.profile_url,
         }
-        for lecturer in lecturers if lecturer.room_number
+        for lecturer in lecturers
     }
 
     return render(request, f'floor{floor_number}map.html', {
         'floor': floor_number,
-        'lecturer_data': lecturer_data,
+        'map_lecturer': lecturer_data,
     })

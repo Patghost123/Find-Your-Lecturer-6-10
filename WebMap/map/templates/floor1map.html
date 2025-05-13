@@ -131,7 +131,7 @@
 <div id="sidebar">
   <h3>Lecturer Details</h3>
   <p id="lecturer-name">Name: </p>
-  <p id="lecturer-office">Office: </p>
+  <p id="lecturer-room_number">Office: </p>
   <p id="lecturer-position">Position: </p>
   <p id="lecturer-email">Email: </p>
   <p id="lecturer-phone">Phone: </p>
@@ -144,7 +144,7 @@
 <div id="debug-panel"></div>
 
 <!-- Embedded JSON data -->
-{{ lecturer_data|json_script:"lecturer-data" }}
+{{ map_lecturer|json_script:"lecturer-data" }}
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', function () {
       console.log("Loaded lecturer data:", lecturers);
       console.log("Total lecturer entries:", Object.keys(lecturers).length);
 
-      const rooms = svg.querySelectorAll('[id^="BR"], [id^="CQAR"]');
+      const rooms = svg.querySelectorAll('[id^="BR"]');
       const unmatchedRooms = [];
 
       rooms.forEach(room => {
@@ -268,7 +268,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         document.getElementById('sidebar').style.display = 'block';
         document.getElementById('lecturer-name').innerText = 'Name: ' + lecturer.name;
-        document.getElementById('lecturer-office').innerText = 'Office: ' + lecturer.office;
+        document.getElementById('lecturer-room_number').innerText = 'Office: ' + lecturer.room_number;
         document.getElementById('lecturer-position').innerText = 'Position: ' + lecturer.position;
         document.getElementById('lecturer-email').innerText = 'Email: ' + lecturer.email;
         document.getElementById('lecturer-phone').innerText = 'Phone: ' + lecturer.phone;

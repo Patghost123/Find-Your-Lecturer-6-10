@@ -13,7 +13,6 @@ urlpatterns = [
     path('success/', views.success, name="success"),
     path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
     path("students/", views.students_list, name="students_list"),
-    path('logout/', auth_views.LogoutView.as_view(next_page='hello'), name='logout'),
     path('map/<int:floor_number>/', views.floor_map, name='floor_map'),
 ]
 
