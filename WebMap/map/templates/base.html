@@ -42,18 +42,20 @@
             gap: 15px; 
         }
 
-        nav a { 
-            color: #cfe2f3; 
-            text-decoration: none; 
-            padding: 10px 15px; 
+        nav a {
+            color: #000000; /* Black font */
+            text-decoration: none;
+            padding: 10px 15px;
             font-size: 16px;
-            border-radius: 6px; /* Gives buttons a soft rounded touch */
-            transition: background 0.3s ease-in-out;
+            border-radius: 6px;
+            transition: background 0.3s ease-in-out, color 0.3s;
         }
 
         nav a:hover {
             background: rgba(255, 255, 255, 0.2);
+            color: #000000; /* Ensures black font remains on hover */
         }
+
 
         /* Container adjustments */
         .container { 
