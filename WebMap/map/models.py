@@ -38,7 +38,7 @@ class Student(AbstractBaseUser, PermissionsMixin):
         self.password = make_password(raw_password)
 
 class Lecturer(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255,)
     position = models.CharField(max_length=255, blank=True)
     faculty = models.CharField(max_length=255, blank=True)
     room_number = models.CharField(max_length=50, blank=True)  

@@ -4,148 +4,146 @@
 
 {% block content %}
 <style>
-    @import url("https://fonts.googleapis.com/css2?family=Manrope:wght@300;500;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@300;500;700&display=swap");
 
-    body {
-        font-family: "Manrope", sans-serif;
-        background: linear-gradient(135deg, #1a1f47, #3b8be2);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-        color: #cfe2f3;
-        overflow: hidden;
-    }
+/* Global Styling */
+body {
+    font-family: "Manrope", sans-serif;
+    background: #ffffff; /* Solid white background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    color: #1a1f47; /* MMU dark blue text */
+}
 
-    /* Glassmorphism Login Container */
-    .login-container {
-        width: 380px;
-        padding: 30px;
-        background: rgba(255, 255, 255, 0.12);
-        border-radius: 14px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-        backdrop-filter: blur(15px);
-        position: relative;
-        animation: smoothSlideIn 1s ease-out;
-        text-align: center;
-    }
+/* Login Container */
+.login-container {
+    width: 380px;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.9); /* Soft white */
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    position: relative;
+    animation: smoothSlideIn 1s ease-out;
+    text-align: center;
+}
 
-    /* Smooth Slide Animations */
-    @keyframes smoothSlideIn {
-        0% {
-            opacity: 0;
-            transform: translateX(80px) scale(0.95);
-        }
-        100% {
-            opacity: 1;
-            transform: translateX(0) scale(1);
-        }
-    }
+/* Smooth Slide Animations */
+@keyframes smoothSlideIn {
+    0% { opacity: 0; transform: translateX(80px) scale(0.95); }
+    100% { opacity: 1; transform: translateX(0) scale(1); }
+}
 
-    @keyframes smoothSlideOut {
-        0% {
-            opacity: 1;
-            transform: translateX(0) scale(1);
-        }
-        100% {
-            opacity: 0;
-            transform: translateX(-80px) scale(0.95);
-        }
-    }
+@keyframes smoothSlideOut {
+    0% { opacity: 1; transform: translateX(0) scale(1); }
+    100% { opacity: 0; transform: translateX(-80px) scale(0.95); }
+}
 
-    .slide-out {
-        animation: smoothSlideOut 0.6s ease-in forwards;
-    }
+.slide-out { animation: smoothSlideOut 0.6s ease-in forwards; }
 
-    .login-container h1 {
-        font-size: 24px;
-        margin-bottom: 20px;
-        color: #ffffff;
-    }
+/* Heading */
+.login-container h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #1a1f47;
+}
 
-    /* Label Styling */
-    label {
-        display: block;
-        text-align: left;
-        margin-bottom: 8px;
-        font-size: 14px;
-        color: #8fb1d6;
-    }
+/* Label Styling */
+label {
+    display: block;
+    text-align: left;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #3b8be2;
+}
 
-    /* Input Fields */
-    input {
-        width: calc(100% - 20px);
-        padding: 12px;
-        margin: 12px 0;
-        border: none;
-        border-radius: 6px;
-        font-size: 16px;
-        background: rgba(255, 255, 255, 0.2);
-        color: #cfe2f3;
-        animation: smoothSlideIn 1s ease-out 0.2s backwards;
-    }
+/* Input Fields */
+input {
+    width: calc(100% - 20px);
+    padding: 12px;
+    margin: 12px 0;
+    border: 1px solid #3b8be2; /* Default border */
+    border-radius: 6px;
+    font-size: 16px;
+    background: #ffffff;
+    color: #000000; /* Black text */
+}
 
-    input:focus {
-        outline: none;
-        border: 1px solid #0056b3;
-        box-shadow: 0 0 5px rgba(0, 86, 179, 0.5);
-    }
+/* Input Focus Effect */
+input:focus {
+    outline: none;
+    border: 2px solid #000000; /* Turns black on click */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5); /* Subtle glow */
+}
 
-    input::placeholder {
-        color: #8fb1d6;
-    }
+/* Placeholder */
+input::placeholder {
+    color: #8fb1d6;
+}
 
-    /* Button */
-    button {
-        width: 100%;
-        padding: 14px;
-        background: linear-gradient(135deg, #38b6ff, #005fae);
-        color: white;
-        font-size: 18px;
-        font-weight: 600;
-        cursor: pointer;
-        border-radius: 6px;
-        transition: background 0.4s ease-in-out;
-        border: none;
-        animation: smoothSlideIn 1s ease-out 0.3s backwards;
-    }
+/* Buttons */
+button {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #38b6ff, #005fae);
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 6px;
+    border: none;
+    transition: background 0.3s ease-in-out;
+}
 
-    button:hover {
-        background: linear-gradient(135deg, #0079c7, #004a92);
-    }
+/* Hover & Click Effect */
+button:hover { background: linear-gradient(135deg, #0079c7, #004a92); }
+button:active { transform: scale(0.96); }
 
-    button:active {
-        transform: scale(0.96);
-    }
+/* Home Button */
+.home-button {
+    padding: 12px 18px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: #38b6ff;
+    color: #000000; /* Black font */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: background 0.3s ease-in-out;
+}
 
-    /* Error Message List */
-    ul {
-        list-style: none;
-        padding: 0;
-        margin-bottom: 15px;
-    }
+.home-button:hover {
+    background: #0079c7;
+}
 
-    li {
-        color: red;
-        font-size: 14px;
-    }
+/* Error Messages */
+ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 15px;
+}
 
-    /* "New User?" Sign Up Link */
-    .new-user {
-        margin-top: 18px;
-        font-size: 15px;
-    }
+li {
+    color: red;
+    font-size: 14px;
+}
 
-    .new-user a {
-        color: #38b6ff;
-        text-decoration: none;
-        font-weight: 500;
-    }
+/* "New User?" Sign Up Link */
+.new-user {
+    margin-top: 18px;
+    font-size: 15px;
+}
 
-    .new-user a:hover {
-        text-decoration: underline;
-    }
+.new-user a {
+    color: #c20f0f;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.new-user a:hover { text-decoration: underline; }
 </style>
 
 <!-- Login Container -->
