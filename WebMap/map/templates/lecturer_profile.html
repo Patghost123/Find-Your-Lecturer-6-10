@@ -1,8 +1,17 @@
+{% load static %}
+
+{% if lecturer.profile_picture %}
+    <img src="{{ lecturer.profile_picture.url }}" alt="{{ lecturer.name }}" class="profile-pic">
+{% else %}
+    <img src="{% static 'lecturer_profiles/' %}" alt="Default Profile">
+{% endif %}
+
+<div class="lecturer-info">
     <h1>{{ lecturer.name }}</h1>
     <p><strong>Position:</strong> {{ lecturer.position }}</p>
     <p><strong>Faculty:</strong> {{ lecturer.faculty }}</p>
     <p><strong>Room:</strong> {{ lecturer.room_number }}</p>
     <p><strong>Phone:</strong> {{ lecturer.phone }}</p>
     <p><strong>Email:</strong> <a href="mailto:{{ lecturer.email }}">{{ lecturer.email }}</a></p>
-    <p><strong>Lecturer link:</strong> {{ lecturer.profile_url }}</p>
+    <p><strong>Lecturer link:</strong> <a href="{{ lecturer.profile_url }}" target="_blank">View Profile</a></p>
 </div>
