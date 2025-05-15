@@ -1,7 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login as auth_login
 from .models import Student, Lecturer
 from django.contrib.auth.hashers import make_password
+from django.http import JsonResponse
+import requests
 
 def join(request):
     if request.method != "POST":  # Guard clause for GET requests
@@ -83,3 +85,25 @@ def floor_map(request, floor_number=1):
         'floor': floor_number,
         'map_lecturer': lecturer_data,
     })
+    
+def home(request):
+    lecturers = Lecturer.objects.all()  # Fetch all users from the database
+    return render(request, "home.html", {"lecturers": lecturers})
+
+def get_lecturers(request):
+    if request.method != "GET":
+        return JsonResponse({"error": "Invalid request method"}, status=405)
+    if not request.user.is_authenticated:
+            return JsonResponse({"error": "Unauthorized"}, status=401)
+    query = request.GET.get("q", "").strip().lower()
+    if not isinstance(query, str):
+        return JsonResponse({"error": "Invalid query parameter"}, status=400)
+    if len(query) > 100:  
+        return JsonResponse({"error": "Query too long"}, status=400)
+    lecturers = Lecturer.objects.filter(name__icontains=query) if query else Lecturer.objects.all()
+
+    return JsonResponse({"lecturers": list(lecturers.values("name"))})
+
+def lecturer_profile(request, lecturer_name):
+    lecturer = get_object_or_404(Lecturer, name=lecturer_name)
+    return render(request, "lecturer_profile.html", {"lecturer": lecturer})
