@@ -129,6 +129,92 @@
             background-color: #005f7f; /* Darker shade on hover */
             box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3); /* Slightly larger shadow */
 }
+
+/* Search bar */
+        .search-bar {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+.search-bar {
+    position: relative;
+    width: 350px; /* Slightly wider for better usability */
+    margin: 20px auto; /* Adds vertical space & centers */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 🔹 Sleek Search Box */
+#searchBox {
+    width: 200%;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px; 
+    outline: none;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); 
+}
+
+#searchBox:focus {
+    border-color: #007bff; 
+    box-shadow: 0px 2px 10px rgba(0, 123, 255, 0.3);
+}
+
+/* 🔹 Dropdown List Styling */
+.dropdown-list {
+    position: absolute;
+    top: 105%; /* Ensures it sits just below */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200%;
+    max-height: 250px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px; /* Rounded corners */
+    display: none;
+    list-style-type: none;
+    padding: 8px;
+    z-index: 9999;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* 🔹 List Items */
+.dropdown-list li {
+    color: black;
+    font-size: 16px;
+    padding: 10px;
+    cursor: pointer;
+    text-align: left; 
+    border-radius: 6px; 
+    transition: background 0.2s ease-in-out;
+}
+
+.dropdown-list li:hover {
+    background: #007bff;
+    color: white; 
+}
+
+.search-btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color:rgb(167, 0, 0); 
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+    margin-left: 850px;
+    margin-top: -39.8px;
+}
+
+.search-btn:hover {
+    background-color:rgb(133, 0, 0); 
+}
+
     </style>
 </head>
 <body>
@@ -158,6 +244,69 @@
     <nav>
         <!-- Navigation Links -->
     </nav>
+    {% if request.user.is_authenticated %}
+    <div class="search-bar">
+        <input type="text" id="searchBox" placeholder="Search lecturers..." onfocus="showLecturers()" onkeyup="searchLecturers()">
+        <ul id="lecturerList" class="dropdown-list"></ul>
+        <button class="search-btn" onclick="redirectToProfile()">Search</button>
+    </div>
+{% endif %}
+    
+    <script>
+function showLecturers() {
+    fetch("/get_lecturers/")
+        .then(response => response.json())
+        .then(data => {
+            console.log("Lecturers data:", data); // Debugging: Check what’s being fetched
+            let list = document.getElementById("lecturerList");
+            list.innerHTML = data.lecturers
+                .map(lecturer => `<li onclick="selectLecturer(this)">${lecturer.name}</li>`)
+                .join("");
+            list.style.display = "block"; // Show dropdown
+        })
+        .catch(error => console.error("Error fetching lecturers:", error)); // Catch errors
+}
+
+function searchLecturers() {
+    let query = document.getElementById("searchBox").value.toLowerCase();
+    let lecturers = document.querySelectorAll("#lecturerList li");
+    
+    lecturers.forEach(lecturer => {
+        let text = lecturer.textContent.toLowerCase();
+        lecturer.style.display = text.includes(query) ? "" : "none";
+    });
+}
+
+// Function to select a lecturer from the list
+function selectLecturer(element) {
+    document.getElementById("searchBox").value = element.textContent;
+    document.getElementById("lecturerList").style.display = "none"; // Hide dropdown after selection
+}
+
+document.addEventListener("click", function (event) {
+    let searchBox = document.getElementById("searchBox");
+    let list = document.getElementById("lecturerList");
+
+    // Check if the click is outside the search box and lecturer list
+    if (!searchBox.contains(event.target) && !list.contains(event.target)) {
+        list.style.display = "none"; // Hide dropdown when clicking outside
+    }
+});
+
+// Show dropdown when clicking on the search box
+document.getElementById("searchBox").addEventListener("focus", function () {
+    document.getElementById("lecturerList").style.display = "block";
+});
+
+function redirectToProfile() {
+    let query = document.getElementById("searchBox").value.trim();
+
+    if (query !== "") {
+        window.location.href = `/lecturer/${query}/`; // Redirects to lecturer profile
+    }
+}
+        </script>
+        </div>
 
     <main>
         <h2>Discover More</h2>
