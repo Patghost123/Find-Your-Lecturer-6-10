@@ -46,6 +46,7 @@ class Lecturer(models.Model):
     email = models.EmailField(blank=True)
     profile_url = models.URLField(blank=True)
     office_hours = models.TextField()
+    profile_pic = models.ImageField(upload_to='lecturer_profiles/', blank=True, null=True)
 
     def __str__(self):
         return self.name

@@ -1,9 +1,11 @@
+import os
 import re
 import time
 import requests
 import pprint
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
+from django.core.files.base import ContentFile
 
 from django.core.management.base import BaseCommand
 from map.models import Lecturer  # Adjust if your app name is different
@@ -14,10 +16,8 @@ HEADERS = {
 }
 DELAY = 1  # seconds
 
-
 def clean_profile_url(url):
     return url.replace('/../', '/') if '/../' in url else url
-
 
 def get_all_staff_links():
     try:
@@ -93,13 +93,14 @@ def extract_profile_details(url, directory_data):
             'name': directory_data['name'],
             'position': directory_data['position'],
             'faculty': '',
-            'room_number': '',  # Changed from 'room' to 'room_number'
+            'room_number': '',
             'phone': '',
             'email': '',
-            'profile_url': url
+            'profile_url': url,
+            'profile_pic_file': None
         }
 
-        # Primary extraction
+        # Extract text fields...
         cell = soup.select_one('div.col-md-9 table tbody tr td:nth-child(2)')
         if cell:
             faculty_text = cell.get_text(separator='|').split('|')
@@ -109,7 +110,7 @@ def extract_profile_details(url, directory_data):
             room_el = cell.select_one('span:nth-child(7)')
             if room_el:
                 room_text = room_el.get_text(strip=True)
-                data['room_number'] = room_text.split(',')[0].strip()  # Updated to 'room_number'
+                data['room_number'] = room_text.split(',')[0].strip()
 
             text_content = cell.get_text()
             phone_match = re.search(r'(\+?\d{2,3}-\d{7,8}|\d{10,11})', text_content)
@@ -120,11 +121,9 @@ def extract_profile_details(url, directory_data):
             if email_match:
                 data['email'] = email_match.group(0)
 
-        # === Fallbacks using full text scan ===
+        # Fallback parsing
         full_text = soup.get_text(separator='\n')
-        lines = [line.strip() for line in full_text.split('\n') if line.strip()]
-
-        for line in lines:
+        for line in [l.strip() for l in full_text.split('\n') if l.strip()]:
             if not data['faculty'] and 'faculty' in line.lower():
                 data['faculty'] = line
             elif not data['room_number'] and re.search(r'(room|br|fci)\s*\d+', line.lower()):
@@ -134,8 +133,18 @@ def extract_profile_details(url, directory_data):
             elif not data['email'] and '@mmu.edu.my' in line:
                 data['email'] = re.search(r'[\w\.-]+@mmu\.edu\.my', line).group()
 
-        # Standardize room number before returning
         data['room_number'] = clean_room_number(data['room_number'])
+
+        # Image extraction
+        img_tag = soup.select_one('div.col-md-9 img')
+        if img_tag and img_tag.has_attr('src'):
+            img_src = img_tag['src'].strip()
+            img_url = urljoin(url, img_src)
+            img_response = requests.get(img_url, headers=HEADERS, timeout=10)
+            img_response.raise_for_status()
+            img_content = img_response.content
+            img_name = os.path.basename(img_src)
+            data['profile_pic_file'] = ContentFile(img_content, name=img_name)
 
         return data
 
@@ -148,6 +157,10 @@ class Command(BaseCommand):
     help = 'Updates Lecturer data from MMU Expert website'
 
     def handle(self, *args, **kwargs):
+        # Clear all existing lecturers before update
+        Lecturer.objects.all().delete()
+        self.stdout.write(self.style.WARNING("Lecturer database cleared."))
+
         staff_directory_data = get_all_staff_links()
         if not staff_directory_data:
             self.stdout.write(self.style.ERROR("No staff profiles found. Exiting."))
@@ -163,24 +176,31 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.NOTICE("Extracted data:"))
                 self.stdout.write(pprint.pformat(profile_data))
 
-                room_number = profile_data.get('room_number') or 'N/A'  # Use 'N/A' if room_number is missing
-                
-                # Save or update the lecturer, even if room_number is 'N/A'
+                room_number = profile_data.get('room_number') or 'N/A'
+
+                # Remove image file from defaults temporarily
+                profile_pic_file = profile_data.pop('profile_pic_file', None)
+
+                # Save or update the lecturer (excluding image for now)
                 lecturer, created = Lecturer.objects.update_or_create(
                     name=profile_data['name'],  # Use name as unique identifier
                     defaults={
                         **profile_data,
-                        'room_number': room_number  # Assign the standardized room number
+                        'room_number': room_number
                     }
                 )
 
+                # Save profile picture to the same Lecturer instance
+                if profile_pic_file:
+                    lecturer.profile_pic.save(profile_pic_file.name, profile_pic_file, save=True)
+
                 if created:
                     self.stdout.write(self.style.SUCCESS(
-                        f"Created: {profile_data['name']} | Room: {room_number}"
+                        f"Created: {lecturer.name} | Room: {room_number}"
                     ))
                 else:
                     self.stdout.write(self.style.SUCCESS(
-                        f"Updated: {profile_data['name']} | Room: {room_number}"
+                        f"Updated: {lecturer.name} | Room: {room_number}"
                     ))
 
         self.stdout.write(self.style.SUCCESS("Lecturer database update completed."))
