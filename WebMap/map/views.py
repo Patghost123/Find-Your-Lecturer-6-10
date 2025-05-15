@@ -106,4 +106,4 @@ def get_lecturers(request):
 
 def lecturer_profile(request, lecturer_name):
     lecturer = get_object_or_404(Lecturer, name=lecturer_name)
-    return render(request, "lecturerprofiles.html", {"lecturer": lecturer})
+    return render(request, "lecturer_profile.html", {"lecturer": lecturer})
