@@ -75,29 +75,35 @@
         .signup-button {
             left: 20px;
             background-color: #0056b3;
+            transition: background 0.3s ease-in-out, transform 0.2s;
         }
 
         .signup-button:hover {
             background-color: #004494;
+            transform: scale(1.05);
         }
 
         .login-button {
             right: 20px;
             background-color: #0056b3;
+            transition: background 0.3s ease-in-out, transform 0.2s;
         }
 
         .login-button:hover {
             background-color: #004494;
+            transform: scale(1.05);
         }
 
         .logout-button {
             right: 20px;
             top: 20px;
             background-color: #ff0000;
+            transition: background 0.3s ease-in-out, transform 0.2s;
         }
 
         .logout-button:hover {
             background-color: #cc0000;
+            transform: scale(1.05);
         }
 
         .user-info {
@@ -120,14 +126,17 @@
             border-radius: 5px;
             cursor: pointer;
             color: white;
-            background-color: #008CBA; /* Stylish blue */
+            background-color: #008CBA; 
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            transition: background 0.3s ease-in-out, transform 0.2s;
 }
 
         .restricted-button:hover {
-            background-color: #005f7f; /* Darker shade on hover */
-            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3); /* Slightly larger shadow */
+            background-color: #005f7f; 
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3); 
+            transform: scale(1.05);
+            cursor: pointer;
 }
 
 /* Search bar */
@@ -206,13 +215,14 @@
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    transition: background 0.3s ease-in-out;
+    transition: background 0.3s ease-in-out, transform 0.2s;
     margin-left: 850px;
     margin-top: -39.8px;
 }
 
 .search-btn:hover {
-    background-color:rgb(133, 0, 0); 
+    background-color:rgb(133, 0, 0);
+    transform: scale(1.05);
 }
 
     </style>
