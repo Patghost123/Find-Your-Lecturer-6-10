@@ -298,9 +298,11 @@ function searchLecturers() {
     });
 }
 
-function selectLecturer(element) {
-    document.getElementById("searchBox").value = element.textContent;
-    document.getElementById("lecturerList").style.display = "none"; // Hide dropdown after selection
+function selectLecturer(name, slug) {
+    document.getElementById("searchBox").value = name;
+    selectedSlug = slug;
+    document.getElementById("lecturerList").style.display = "none";
+}
 
 // Function to select a lecturer from the list
 function selectLecturer(name, slug) {
@@ -330,7 +332,7 @@ function redirectToProfile() {
     } else {
         alert("Please select a lecturer from the list.");
     }
-<script>
-
+}
+</script>
 </body>
 <html>
