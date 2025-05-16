@@ -269,21 +269,35 @@
     background: #007bff;
     color: white; 
 }
-    </style>
+</style>
 
+<<<<<<< HEAD
     <script>
+=======
+<script>
+let selectedSlug = null;
+
+>>>>>>> 8f5a554081f4c4fa3085852cf898881ce16e06e3
 function showLecturers() {
     fetch("/get_lecturers/")
         .then(response => response.json())
         .then(data => {
+<<<<<<< HEAD
             console.log("Lecturers data:", data); 
+=======
+>>>>>>> 8f5a554081f4c4fa3085852cf898881ce16e06e3
             let list = document.getElementById("lecturerList");
             list.innerHTML = data.lecturers
-                .map(lecturer => `<li onclick="selectLecturer(this)">${lecturer.name}</li>`)
-                .join("");
-            list.style.display = "block"; // Show dropdown
+                .map(lecturer => 
+                    `<li onclick="selectLecturer('${lecturer.name}', '${lecturer.slug}')">${lecturer.name}</li>`
+                ).join("");
+            list.style.display = "block";
         })
+<<<<<<< HEAD
         .catch(error => console.error("Error fetching lecturers:", error)); 
+=======
+        .catch(error => console.error("Error fetching lecturers:", error));
+>>>>>>> 8f5a554081f4c4fa3085852cf898881ce16e06e3
 }
 
 function searchLecturers() {
@@ -296,10 +310,15 @@ function searchLecturers() {
     });
 }
 
-
 function selectLecturer(element) {
     document.getElementById("searchBox").value = element.textContent;
     document.getElementById("lecturerList").style.display = "none"; // Hide dropdown after selection
+
+// Function to select a lecturer from the list
+function selectLecturer(name, slug) {
+    document.getElementById("searchBox").value = name;
+    selectedSlug = slug;
+    document.getElementById("lecturerList").style.display = "none";
 }
 
 document.addEventListener("click", function (event) {
@@ -318,13 +337,17 @@ document.getElementById("searchBox").addEventListener("focus", function () {
 });
 
 function redirectToProfile() {
-    let query = document.getElementById("searchBox").value.trim();
-
-    if (query !== "") {
-        window.location.href = `/lecturer/${query}/`; // Redirects to lecturer profile
+    if (selectedSlug) {
+        window.location.href = `/lecturer/${selectedSlug}/`;
+    } else {
+        alert("Please select a lecturer from the list.");
     }
 }
+<<<<<<< HEAD
 
     </script>
+=======
+</script>
+>>>>>>> 8f5a554081f4c4fa3085852cf898881ce16e06e3
 </body>
 </html>

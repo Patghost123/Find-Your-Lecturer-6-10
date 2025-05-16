@@ -262,19 +262,21 @@
     </div>
 {% endif %}
     
-    <script>
+<script>
+let selectedSlug = null;
+
 function showLecturers() {
     fetch("/get_lecturers/")
         .then(response => response.json())
         .then(data => {
-            console.log("Lecturers data:", data); // Debugging: Check what’s being fetched
             let list = document.getElementById("lecturerList");
             list.innerHTML = data.lecturers
-                .map(lecturer => `<li onclick="selectLecturer(this)">${lecturer.name}</li>`)
-                .join("");
-            list.style.display = "block"; // Show dropdown
+                .map(lecturer => 
+                    `<li onclick="selectLecturer('${lecturer.name}', '${lecturer.slug}')">${lecturer.name}</li>`
+                ).join("");
+            list.style.display = "block";
         })
-        .catch(error => console.error("Error fetching lecturers:", error)); // Catch errors
+        .catch(error => console.error("Error fetching lecturers:", error));
 }
 
 function searchLecturers() {
@@ -288,9 +290,10 @@ function searchLecturers() {
 }
 
 // Function to select a lecturer from the list
-function selectLecturer(element) {
-    document.getElementById("searchBox").value = element.textContent;
-    document.getElementById("lecturerList").style.display = "none"; // Hide dropdown after selection
+function selectLecturer(name, slug) {
+    document.getElementById("searchBox").value = name;
+    selectedSlug = slug;
+    document.getElementById("lecturerList").style.display = "none";
 }
 
 document.addEventListener("click", function (event) {
@@ -309,14 +312,15 @@ document.getElementById("searchBox").addEventListener("focus", function () {
 });
 
 function redirectToProfile() {
-    let query = document.getElementById("searchBox").value.trim();
-
-    if (query !== "") {
-        window.location.href = `/lecturer/${query}/`; // Redirects to lecturer profile
+    if (selectedSlug) {
+        window.location.href = `/lecturer/${selectedSlug}/`;
+    } else {
+        alert("Please select a lecturer from the list.");
     }
 }
-        </script>
-        </div>
+
+    </script>
+    </div>
 
     <main>
         <h2>Discover More</h2>
@@ -342,5 +346,6 @@ function redirectToProfile() {
             .bindPopup('You are here!')
             .openPopup();
     </script>
+    
 </body>
 </html>

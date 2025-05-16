@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 from django.contrib.auth.hashers import make_password
+from django.utils.text import slugify
 
 class StudentManager(BaseUserManager):
     def create_user(self, username, email, password=None):
@@ -39,6 +40,7 @@ class Student(AbstractBaseUser, PermissionsMixin):
 
 class Lecturer(models.Model):
     name = models.CharField(max_length=255,)
+    slug = models.SlugField(unique=True, blank=True)
     position = models.CharField(max_length=255, blank=True)
     faculty = models.CharField(max_length=255, blank=True)
     room_number = models.CharField(max_length=50, blank=True)  
@@ -48,6 +50,10 @@ class Lecturer(models.Model):
     office_hours = models.TextField()
     profile_pic = models.ImageField(upload_to='lecturer_profiles/', blank=True, null=True)
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name

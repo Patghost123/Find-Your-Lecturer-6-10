@@ -102,8 +102,10 @@ def get_lecturers(request):
         return JsonResponse({"error": "Query too long"}, status=400)
     lecturers = Lecturer.objects.filter(name__icontains=query) if query else Lecturer.objects.all()
 
-    return JsonResponse({"lecturers": list(lecturers.values("name"))})
+    return JsonResponse({
+    "lecturers": list(lecturers.values("name", "slug"))
+    })
 
-def lecturer_profile(request, lecturer_name):
-    lecturer = get_object_or_404(Lecturer, name=lecturer_name)
+def lecturer_profile(request, slug):
+    lecturer = get_object_or_404(Lecturer, slug=slug)
     return render(request, "lecturer_profile.html", {"lecturer": lecturer})
