@@ -158,8 +158,14 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         # Clear all existing lecturers before update
+        for lecturer in Lecturer.objects.all():
+            if lecturer.profile_pic:
+                path = lecturer.profile_pic.path
+                if os.path.isfile(path):
+                    os.remove(path)
+                    self.stdout.write(self.style.WARNING(f"Deleted image: {path}"))
         Lecturer.objects.all().delete()
-        self.stdout.write(self.style.WARNING("Lecturer database cleared."))
+        self.stdout.write(self.style.WARNING("Lecturer database and images cleared."))
 
         staff_directory_data = get_all_staff_links()
         if not staff_directory_data:

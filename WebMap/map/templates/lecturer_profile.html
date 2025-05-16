@@ -271,21 +271,13 @@
 }
 </style>
 
-<<<<<<< HEAD
     <script>
-=======
-<script>
 let selectedSlug = null;
 
->>>>>>> 8f5a554081f4c4fa3085852cf898881ce16e06e3
 function showLecturers() {
     fetch("/get_lecturers/")
         .then(response => response.json())
         .then(data => {
-<<<<<<< HEAD
-            console.log("Lecturers data:", data); 
-=======
->>>>>>> 8f5a554081f4c4fa3085852cf898881ce16e06e3
             let list = document.getElementById("lecturerList");
             list.innerHTML = data.lecturers
                 .map(lecturer => 
@@ -293,11 +285,7 @@ function showLecturers() {
                 ).join("");
             list.style.display = "block";
         })
-<<<<<<< HEAD
-        .catch(error => console.error("Error fetching lecturers:", error)); 
-=======
         .catch(error => console.error("Error fetching lecturers:", error));
->>>>>>> 8f5a554081f4c4fa3085852cf898881ce16e06e3
 }
 
 function searchLecturers() {
@@ -342,8 +330,6 @@ function redirectToProfile() {
     } else {
         alert("Please select a lecturer from the list.");
     }
-}
-
-</script>
+    </script>
 </body>
 </html>
