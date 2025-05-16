@@ -272,18 +272,18 @@
     </style>
 
     <script>
-        function showLecturers() {
+function showLecturers() {
     fetch("/get_lecturers/")
         .then(response => response.json())
         .then(data => {
-            console.log("Lecturers data:", data); // Debugging: Check what’s being fetched
+            console.log("Lecturers data:", data); 
             let list = document.getElementById("lecturerList");
             list.innerHTML = data.lecturers
                 .map(lecturer => `<li onclick="selectLecturer(this)">${lecturer.name}</li>`)
                 .join("");
             list.style.display = "block"; // Show dropdown
         })
-        .catch(error => console.error("Error fetching lecturers:", error)); // Catch errors
+        .catch(error => console.error("Error fetching lecturers:", error)); 
 }
 
 function searchLecturers() {
@@ -296,7 +296,7 @@ function searchLecturers() {
     });
 }
 
-// Function to select a lecturer from the list
+
 function selectLecturer(element) {
     document.getElementById("searchBox").value = element.textContent;
     document.getElementById("lecturerList").style.display = "none"; // Hide dropdown after selection
@@ -325,6 +325,6 @@ function redirectToProfile() {
     }
 }
 
-        </script>
+    </script>
 </body>
 </html>
