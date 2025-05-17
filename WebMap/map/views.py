@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login as auth_login
-from .models import Student, Lecturer
-from django.contrib.auth.hashers import make_password
+from .models import CustomUser, Lecturer
 from django.http import JsonResponse
 
 def join(request):
@@ -16,47 +15,37 @@ def join(request):
     if not username or not email or not password:
         return render(request, "join.html", {"error": "All fields are required!"})
 
-    if Student.objects.filter(username=username).exists():
+    if CustomUser.objects.filter(username=username).exists():
         return render(request, "join.html", {"error": "Username already taken."})
 
     # Main signup logic
-    student = Student(username=username, email=email, password=make_password(password))
+    student = CustomUser.objects.create_user(username=username, email=email, password=password, role="student")
     student.save()
     
     return redirect("/login/")
 
-
 def login(request):
     if request.method != "POST":
-        return render(request, "login.html")  
+        return render(request, "login.html")
 
-    # Extract login credentials
     username = request.POST.get("username", "").strip()
     password = request.POST.get("password", "").strip()
-    
+
     user = authenticate(request, username=username, password=password)
 
-    # Handle authentication result
-    if user is not None:
-        print("User authenticated:", user.username)  
-        auth_login(request, user)  
-        print("Redirecting now...")  
-        return redirect("home")  
-
-    print("Login failed!")
-    return render(request, "login.html", {"error": "Invalid username or password!"})
-
+    if user is not None and user.is_active:
+        auth_login(request, user)
+        print(f"{user.role.capitalize()} {user.username} logged in.")
+        return redirect("home")
+    else:
+        return render(request, "login.html", {"error": "Invalid credentials"})
 
 def home(request):
-    return render(request, 'home.html', {'student': request.user if request.user.is_authenticated else None})
-
-def success(request):
-    return render(request, 'success.html')
-
-def students_list(request):
-    students = Student.objects.all()
-    students = Student.objects.exclude(username__in=["FCILecturer", "adminfindyourlecturer"]).exclude(email__in=["FCILecturer@gmail.com", "adminfindyourlecturer@gmail.com"])
-    return render(request, "students.html", {"students": students})
+    lecturers = Lecturer.objects.all()
+    return render(request, "home.html", {
+        "lecturers": lecturers,
+        "user": request.user if request.user.is_authenticated else None
+    })
     
 def floor_map(request, floor_number=1):       # select floor number based on selected florr
     if floor_number not in [1, 2, 3]:
@@ -81,10 +70,13 @@ def floor_map(request, floor_number=1):       # select floor number based on sel
         'floor': floor_number,
         'map_lecturer': lecturer_data,
     })
-    
-def home(request):
-    lecturers = Lecturer.objects.all()  
-    return render(request, "home.html", {"lecturers": lecturers})
+
+def success(request):
+    return render(request, 'success.html')
+
+def students_list(request):
+    students = CustomUser.objects.filter(role="student")
+    return render(request, "students.html", {"students": students})
 
 def get_lecturers(request):
     if request.method != "GET":              # Any other method other than GET then return error

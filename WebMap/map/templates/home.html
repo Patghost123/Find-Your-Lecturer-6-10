@@ -237,7 +237,7 @@
             <button type="submit" class="logout-button">Logout</button>
         </form>
 
-        {% if user.username == "FCILecturer" %}
+        {% if user.is_staff %}
             <button class="restricted-button" onclick="window.location.href='/students';">View Student List</button>
         {% endif %}
 

@@ -1,8 +1,8 @@
 from django import forms
-from .models import Student
+from .models import CustomUser
 
 class userForm(forms.ModelForm):
     
     class Meta:
-        model = Student
+        model = CustomUser
         fields = ["email", "username" , "password"]

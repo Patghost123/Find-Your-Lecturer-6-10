@@ -1,39 +1,63 @@
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group, Permission
 from django.db import models
 from django.contrib.auth.hashers import make_password
 from django.utils.text import slugify
 
-class StudentManager(BaseUserManager):
-    def create_user(self, username, email, password=None):
+class CustomUserManager(BaseUserManager):
+    def create_user(self, username, email, password=None, role='student'):
         if not email:
             raise ValueError("Users must have an email address")
 
-        user = self.model(username=username, email=email)
-        user.set_password(password)  # Secure password hashing
-        user.is_staff = False  # Prevent normal users from accessing admin
-        user.is_active = True  # Needed for authentication
+        user = self.model(username=username, email=email, role=role)
+        user.set_password(password)
+        user.is_active = True
         user.save(using=self._db)
         return user
 
     def create_superuser(self, username, email, password):
-        user = self.create_user(username, email, password)
-        user.is_staff = True  # Allows admin panel access
-        user.is_superuser = True  # Grants full permissions
+        user = self.create_user(username, email, password, role='admin')
+        user.is_staff = True
+        user.is_superuser = True
         user.save(using=self._db)
         return user
 
-class Student(AbstractBaseUser, PermissionsMixin):
+
+class CustomUser(AbstractBaseUser, PermissionsMixin):
+    ROLE_CHOICES = (
+        ('student', 'Student'),
+        ('lecturer', 'Lecturer'),
+        ('admin', 'Admin'),
+    )
+
     username = models.CharField(unique=True, max_length=100)
     email = models.EmailField(unique=True)
-    password = models.CharField(max_length=128)
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='student')
+    
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
 
-    is_staff = models.BooleanField(default=False)  # Required for admin access
-    is_active = models.BooleanField(default=True)  # Needed for authentication
+    groups = models.ManyToManyField(
+        Group,
+        related_name='customuser_set',
+        blank=True,
+        help_text='The groups this user belongs to.',
+        verbose_name='groups'
+    )
+    user_permissions = models.ManyToManyField(
+        Permission,
+        related_name='customuser_permissions',
+        blank=True,
+        help_text='Specific permissions for this user.',
+        verbose_name='user permissions'
+    )
 
-    objects = StudentManager()
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email']
 
-    USERNAME_FIELD = "username"
-    REQUIRED_FIELDS = ["email"]
+    objects = CustomUserManager()
+
+    def __str__(self):
+        return f"{self.username} ({self.role})"
 
     def set_password(self, raw_password):
         self.password = make_password(raw_password)
@@ -43,8 +67,8 @@ class Lecturer(models.Model):
     slug = models.SlugField(unique=True, blank=True)
     position = models.CharField(max_length=255, blank=True)
     faculty = models.CharField(max_length=255, blank=True)
-    room_number = models.CharField(max_length=50, blank=True)  
-    phone = models.CharField(max_length=50, blank=True)
+    room_number = models.CharField(max_length=50, null=True, blank=True)  
+    phone = models.CharField(max_length=50, null=True, blank=True)
     email = models.EmailField(blank=True)
     profile_url = models.URLField(blank=True)
     office_hours = models.TextField()

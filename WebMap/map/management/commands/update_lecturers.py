@@ -6,9 +6,9 @@ import pprint
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from django.core.files.base import ContentFile
-
 from django.core.management.base import BaseCommand
-from map.models import Lecturer  # Adjust if your app name is different
+from map.models import Lecturer, CustomUser
+from django.db import connection
 
 BASE_URL = "https://mmuexpert.mmu.edu.my/FCI"
 HEADERS = {
@@ -157,16 +157,23 @@ class Command(BaseCommand):
     help = 'Updates Lecturer data from MMU Expert website'
 
     def handle(self, *args, **kwargs):
-        # Clear all existing lecturers before update
+        # Clear all existing lecturers and their images
         for lecturer in Lecturer.objects.all():
             if lecturer.profile_pic:
                 path = lecturer.profile_pic.path
                 if os.path.isfile(path):
                     os.remove(path)
                     self.stdout.write(self.style.WARNING(f"Deleted image: {path}"))
+
+        # Delete lecturer's data
         Lecturer.objects.all().delete()
         self.stdout.write(self.style.WARNING("Lecturer database and images cleared."))
 
+        # Delete lecturer user accounts and reset ID sequence
+        CustomUser.objects.filter(role='lecturer').delete()
+        self.stdout.write(self.style.WARNING("All lecturer CustomUser accounts deleted."))
+
+        # Start of data collection and account creation
         staff_directory_data = get_all_staff_links()
         if not staff_directory_data:
             self.stdout.write(self.style.ERROR("No staff profiles found. Exiting."))
@@ -182,31 +189,61 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.NOTICE("Extracted data:"))
                 self.stdout.write(pprint.pformat(profile_data))
 
-                room_number = profile_data.get('room_number') or 'N/A'
+                room_number = profile_data.get('room_number') or None
+                email = profile_data.get('email')
 
-                # Remove image file from defaults temporarily
+                # Remove image file temporarily
                 profile_pic_file = profile_data.pop('profile_pic_file', None)
 
                 # Save or update the lecturer (excluding image for now)
                 lecturer, created = Lecturer.objects.update_or_create(
-                    name=profile_data['name'],  # Use name as unique identifier
+                    name=profile_data['name'],
                     defaults={
                         **profile_data,
                         'room_number': room_number
                     }
                 )
 
-                # Save profile picture to the same Lecturer instance
+                # Save profile picture
                 if profile_pic_file:
                     lecturer.profile_pic.save(profile_pic_file.name, profile_pic_file, save=True)
 
                 if created:
                     self.stdout.write(self.style.SUCCESS(
-                        f"Created: {lecturer.name} | Room: {room_number}"
+                        f"Created: {lecturer.name} | Room: {room_number or 'N/A'}"
                     ))
                 else:
                     self.stdout.write(self.style.SUCCESS(
-                        f"Updated: {lecturer.name} | Room: {room_number}"
+                        f"Updated: {lecturer.name} | Room: {room_number or 'N/A'}"
+                    ))
+
+                # Create CustomUser account for lecturer if email available
+                if email:
+                    try:
+                        user, user_created = CustomUser.objects.get_or_create(
+                            email=email,
+                            defaults={
+                                'username': f'lecturer{lecturer.id}',
+                                'role': 'lecturer',
+                            }
+                        )
+                        if user_created:
+                            user.set_password('lecturerpass')  # change to a secure password policy later
+                            user.save()
+                            self.stdout.write(self.style.SUCCESS(
+                                f"Created user for: {lecturer.name} | {user.username}"
+                            ))
+                        else:
+                            self.stdout.write(self.style.WARNING(
+                                f"User already exists for: {lecturer.name}"
+                            ))
+                    except Exception as e:
+                        self.stdout.write(self.style.ERROR(
+                            f"Failed to create user for {lecturer.name}: {e}"
+                        ))
+                else:
+                    self.stdout.write(self.style.WARNING(
+                        f"No email for {lecturer.name}, user account not created."
                     ))
 
         self.stdout.write(self.style.SUCCESS("Lecturer database update completed."))
