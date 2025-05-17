@@ -254,13 +254,11 @@
     <nav>
         <!-- Navigation Links -->
     </nav>
-    {% if request.user.is_authenticated %}
     <div class="search-bar">
         <input type="text" id="searchBox" placeholder="Search lecturers..." onfocus="showLecturers()" onkeyup="searchLecturers()">
         <ul id="lecturerList" class="dropdown-list"></ul>
         <button class="search-btn" onclick="redirectToProfile()">Search</button>
     </div>
-{% endif %}
     
 <script>
 let selectedSlug = null;
