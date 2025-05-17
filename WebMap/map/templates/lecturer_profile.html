@@ -5,53 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lecturer Profile</title>
-</head>
-<body>
     
-    <button class="home-button" onclick="window.location.href='/home';">Home</button>
-
-    <div class="whole-lecturer">
-        {% if lecturer.profile_pic %}
-            <img src="{{ lecturer.profile_pic.url }}" alt="{{ lecturer.name }}" class="profile-pic">
-        {% else %}
-            <img src="{% static 'lecturer_profiles/default-profile.png' %}" alt="Default Profile">
-        {% endif %}
-
-        <div class="lecturer-info">
-            <div class="search-button">
-            <input type="text" id="searchBox" placeholder="Search more lecturers..." onfocus="showLecturers()" onkeyup="searchLecturers()">
-        <ul id="lecturerList" class="dropdown-list"></ul>
-        <button class="search-btn" onclick="redirectToProfile()">Search</button>
-            </div>
-            <h1>{{ lecturer.name }}</h1>
-            <p><strong>Position:</strong> {{ lecturer.position }}</p>
-            <p><strong>Faculty:</strong> {{ lecturer.faculty }}</p>
-            <p><strong>Room:</strong> {{ lecturer.room_number }}</p>
-            <p><strong>Phone:</strong> {{ lecturer.phone }}</p>
-            <p><strong>Email:</strong> <a href="mailto:{{ lecturer.email }}">{{ lecturer.email }}</a></p>
-            <p><strong>Lecturer link:</strong> <a href="{{ lecturer.profile_url }}" target="_blank">View Profile</a></p>
-        </div>
-        {% if user.is_authenticated %}
-            <a href="{% url 'home' %}" class="book-session-button">📅 Book Session</a>
-        {% else %}
-            <p> Log in to book a session </p>
-        {% endif %}
-    </div>
-
     <style>
-        .profile-pic {
-            height: 200px;
-            width: 11%;
-            border-radius: 50%;
-        }
-
-        .whole-lecturer {
-            text-align: center;
-            margin-top: 0px;
-            padding: 20px;
-        }
-
-        /* Global Styles */
+        /* ===== Global Styles ===== */
         body {
             font-family: 'Poppins', sans-serif;
             background-color: #f4f4f4;
@@ -64,7 +20,28 @@
             min-height: 100vh;
         }
 
-        /* Lecturer Profile Card */
+        /* ===== Home Button ===== */
+        .home-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 18px;
+            background-color: #007bff;
+            color: #fff;
+            font-size: 16px;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 8px;
+            transition: background 0.3s ease-in-out, transform 0.2s;
+        }
+
+        .home-button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+            cursor: pointer;
+        }
+
+        /* ===== Lecturer Profile Card ===== */
         .whole-lecturer {
             background: #fff;
             padding: 30px;
@@ -76,7 +53,23 @@
             animation: fadeIn 0.8s ease-in-out;
         }
 
-        /* Profile Picture */
+        @media (max-width: 768px) {
+            .whole-lecturer {
+                max-width: 95%;
+                padding: 20px;
+            }
+
+            .profile-pic {
+                width: 120px;
+                height: 120px;
+            }
+
+            .lecturer-info h1 {
+                font-size: 20px;
+            }
+        }
+
+        /* ===== Profile Picture ===== */
         .profile-pic {
             height: 150px;
             width: 150px;
@@ -90,7 +83,7 @@
             transform: scale(1.1);
         }
 
-        /* Lecturer Info */
+        /* ===== Lecturer Info ===== */
         .lecturer-info {
             margin-top: 15px;
             text-align: left;
@@ -119,60 +112,10 @@
             color: #0056b3;
         }
 
-        /* Smooth Fade-In Animation */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .whole-lecturer {
-                max-width: 95%;
-                padding: 20px;
-            }
-
-            .profile-pic {
-                width: 120px;
-                height: 120px;
-            }
-
-            .lecturer-info h1 {
-                font-size: 20px;
-            }
-}
-
-/* Home Button Styles */
-        .home-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            padding: 10px 18px;
-            background-color: #007bff;
-            color: #fff;
-            font-size: 16px;
-            text-decoration: none;
-            font-weight: bold;
-            border-radius: 8px;
-            transition: background 0.3s ease-in-out, transform 0.2s;
-        }
-
-        .home-button:hover {
-            background-color: #0056b3;
-            transform: scale(1.05);
-            cursor: pointer;
-        }
-
-        /* Book Session Button */
+        /* ===== Book Session Button ===== */
         .book-session-button {
             display: inline-block;
-            background:rgb(167, 40, 40);
+            background: rgb(167, 40, 40);
             color: white;
             font-size: 16px;
             font-weight: bold;
@@ -184,158 +127,187 @@
         }
 
         .book-session-button:hover {
-            background:rgb(136, 33, 33);
+            background: rgb(136, 33, 33);
             transform: scale(1.05);
-}
+        }
 
+        /* ===== Search Bar ===== */
         .search-bar {
-        display: flex;
-        justify-content: center;
-        margin-bottom: 20px;
-    }
+            position: relative;
+            width: 350px;
+            margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-.search-bar {
-    position: relative;
-    width: 350px; /* Slightly wider for better usability */
-    margin: 20px auto; /* Adds vertical space & centers */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+        #searchBox {
+            width: 80%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
 
-#searchBox {
-    width: 80%;
-    padding: 12px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 8px; 
-    outline: none;
-    transition: all 0.3s ease-in-out;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); 
-}
+        #searchBox:focus {
+            border-color: #007bff;
+            box-shadow: 0px 2px 10px rgba(0, 123, 255, 0.3);
+        }
 
-#searchBox:focus {
-    border-color: #007bff; 
-    box-shadow: 0px 2px 10px rgba(0, 123, 255, 0.3);
-}
+        .search-btn {
+            padding: 12px 20px;
+            font-size: 16px;
+            background-color: rgb(167, 0, 0);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease-in-out, transform 0.2s;
+        }
 
-.search-btn {
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color:rgb(167, 0, 0); 
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.3s ease-in-out, transform 0.2s;
-    margin-left: 565px;
-    transform: translateY(-40.5px);
-}
+        .search-btn:hover {
+            background-color: rgb(133, 0, 0);
+            transform: scale(1.05);
+        }
 
-.search-btn:hover {
-    background-color:rgb(133, 0, 0);
-    transform: scale(1.05), translateY(-40.5px);
-}
+        .dropdown-list {
+            position: absolute;
+            top: 90%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-450px);
+            width: 40%;
+            max-height: 250px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            display: none;
+            list-style-type: none;
+            padding: 8px;
+            z-index: 9999;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            margin-left: 20px;
+        }
 
-.dropdown-list {
-    position: absolute;
-    top: 105%; 
-    left: 25%;
-    transform: translateX(-50%);
-    width: 40%;
-    max-height: 250px;
-    overflow-y: auto; 
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 8px; /* Rounded corners */
-    display: none;
-    list-style-type: none;
-    padding: 8px;
-    z-index: 9999;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-    transform: translateY(-450px);
-    margin-left: 20px;
-}
+        .dropdown-list li {
+            color: black;
+            font-size: 16px;
+            padding: 10px;
+            cursor: pointer;
+            text-align: left;
+            border-radius: 6px;
+            transition: background 0.2s ease-in-out;
+        }
 
-/* 🔹 List Items */
-.dropdown-list li {
-    color: black;
-    font-size: 16px;
-    padding: 10px;
-    cursor: pointer;
-    text-align: left; 
-    border-radius: 6px; 
-    transition: background 0.2s ease-in-out;
-}
+        .dropdown-list li:hover {
+            background: #007bff;
+            color: white;
+        }
 
-.dropdown-list li:hover {
-    background: #007bff;
-    color: white; 
-}
-</style>
+        /* ===== Animation ===== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
 
-<script>
-let selectedSlug = null;
+    <button class="home-button" onclick="window.location.href='/home';">Home</button>
 
-function showLecturers() {
-    fetch("/get_lecturers/")
-        .then(response => response.json())
-        .then(data => {
+    <div class="whole-lecturer">
+        {% if lecturer.profile_pic %}
+            <img src="{{ lecturer.profile_pic.url }}" alt="{{ lecturer.name }}" class="profile-pic">
+        {% else %}
+            <img src="{% static 'lecturer_profiles/default-profile.png' %}" alt="Default Profile" class="profile-pic">
+        {% endif %}
+
+        <div class="lecturer-info">
+            <div class="search-button">
+                <input type="text" id="searchBox" placeholder="Search more lecturers..." onfocus="showLecturers()" onkeyup="searchLecturers()">
+                <ul id="lecturerList" class="dropdown-list"></ul>
+                <button class="search-btn" onclick="redirectToProfile()">Search</button>
+            </div>
+
+            <h1>{{ lecturer.name }}</h1>
+            <p><strong>Position:</strong> {{ lecturer.position }}</p>
+            <p><strong>Faculty:</strong> {{ lecturer.faculty }}</p>
+            <p><strong>Room:</strong> {{ lecturer.room_number }}</p>
+            <p><strong>Phone:</strong> {{ lecturer.phone }}</p>
+            <p><strong>Email:</strong> <a href="mailto:{{ lecturer.email }}">{{ lecturer.email }}</a></p>
+            <p><strong>Lecturer link:</strong> <a href="{{ lecturer.profile_url }}" target="_blank">View Profile</a></p>
+        </div>
+
+        {% if user.is_authenticated %}
+            <a href="{% url 'home' %}" class="book-session-button">📅 Book Session</a>
+        {% else %}
+            <p>Log in to book a session</p>
+        {% endif %}
+    </div>
+
+    <script>
+        let selectedSlug = null;
+
+        function showLecturers() {
+            fetch("/get_lecturers/")
+                .then(response => response.json())
+                .then(data => {
+                    let list = document.getElementById("lecturerList");
+                    list.innerHTML = data.lecturers
+                        .map(lecturer => 
+                            `<li onclick="selectLecturer('${lecturer.name}', '${lecturer.slug}')">${lecturer.name}</li>`
+                        ).join("");
+                    list.style.display = "block";
+                })
+                .catch(error => console.error("Error fetching lecturers:", error));
+        }
+
+        function searchLecturers() {
+            let query = document.getElementById("searchBox").value.toLowerCase();
+            let lecturers = document.querySelectorAll("#lecturerList li");
+
+            lecturers.forEach(lecturer => {
+                let text = lecturer.textContent.toLowerCase();
+                lecturer.style.display = text.includes(query) ? "" : "none";
+            });
+        }
+
+        function selectLecturer(name, slug) {
+            document.getElementById("searchBox").value = name;
+            selectedSlug = slug;
+            document.getElementById("lecturerList").style.display = "none";
+        }
+
+        function redirectToProfile() {
+            if (selectedSlug) {
+                window.location.href = `/lecturer/${selectedSlug}/`;
+            } else {
+                alert("Please select a lecturer from the list.");
+            }
+        }
+
+        document.addEventListener("click", function (event) {
+            let searchBox = document.getElementById("searchBox");
             let list = document.getElementById("lecturerList");
-            list.innerHTML = data.lecturers
-                .map(lecturer => 
-                    `<li onclick="selectLecturer('${lecturer.name}', '${lecturer.slug}')">${lecturer.name}</li>`
-                ).join("");
-            list.style.display = "block";
-        })
-        .catch(error => console.error("Error fetching lecturers:", error));
-}
 
-function searchLecturers() {
-    let query = document.getElementById("searchBox").value.toLowerCase();
-    let lecturers = document.querySelectorAll("#lecturerList li");
-    
-    lecturers.forEach(lecturer => {
-        let text = lecturer.textContent.toLowerCase();
-        lecturer.style.display = text.includes(query) ? "" : "none";
-    });
-}
+            if (!searchBox.contains(event.target) && !list.contains(event.target)) {
+                list.style.display = "none";
+            }
+        });
 
-function selectLecturer(name, slug) {
-    document.getElementById("searchBox").value = name;
-    selectedSlug = slug;
-    document.getElementById("lecturerList").style.display = "none";
-}
+        document.getElementById("searchBox").addEventListener("focus", function () {
+            document.getElementById("lecturerList").style.display = "block";
+        });
+    </script>
 
-// Function to select a lecturer from the list
-function selectLecturer(name, slug) {
-    document.getElementById("searchBox").value = name;
-    selectedSlug = slug;
-    document.getElementById("lecturerList").style.display = "none";
-}
-
-document.addEventListener("click", function (event) {
-    let searchBox = document.getElementById("searchBox");
-    let list = document.getElementById("lecturerList");
-
-    // Check if the click is outside the search box and lecturer list
-    if (!searchBox.contains(event.target) && !list.contains(event.target)) {
-        list.style.display = "none"; // Hide dropdown when clicking outside
-    }
-});
-
-// Show dropdown when clicking on the search box
-document.getElementById("searchBox").addEventListener("focus", function () {
-    document.getElementById("lecturerList").style.display = "block";
-});
-
-function redirectToProfile() {
-    if (selectedSlug) {
-        window.location.href = `/lecturer/${selectedSlug}/`;
-    } else {
-        alert("Please select a lecturer from the list.");
-    }
-}
-</script>
 </body>
-<html>
+</html>
